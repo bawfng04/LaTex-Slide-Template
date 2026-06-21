@@ -1,0 +1,412 @@
+% ============================================================
+% AI/ML Research Beamer Template — Main Document
+% ============================================================
+
+% 16:9 ratio
+\documentclass[aspectratio=169, xcolor=table]{beamer}
+
+% load pkgs
+\input{pakete}
+
+% use modern metropolis theme
+\usetheme[progressbar=frametitle,block=transparent,titleformat=smallcaps]{metropolis}
+
+% ================================
+% custom colors & styling
+% ================================
+\setbeamercolor{normal text}{fg=darkgray,bg=white}
+\setbeamercolor{frametitle}{bg=myprimary,fg=white}
+\setbeamercolor{progress bar}{fg=myaccent,bg=myprimary!50}
+\setbeamercolor{alerted text}{fg=myaccent}
+
+% footer with page numbers & decorative line
+\setbeamertemplate{footline}{%
+    \begin{tikzpicture}[overlay]
+        \draw[myprimary, line width=0.4pt] (0,0.45) -- (\paperwidth,0.45);
+    \end{tikzpicture}
+    \hfill%
+    \usebeamerfont{page number in head/foot}%
+    \textcolor{myprimary!70}{\insertframenumber\,/\,\inserttotalframenumber}%
+    \hspace*{6pt}\vspace{4pt}%
+}
+
+% background watermark for all slides
+\usebackgroundtemplate{%
+    \begin{tikzpicture}[overlay, remember picture]
+        \begin{scope}[shift={(current page.south east)}, xshift=-1cm, yshift=2.5cm, opacity=0.04, color=myprimary]
+            % sleek abstract geometric network
+            \draw[line width=1.5pt] (0,0) -- (-2.5,-1) -- (-3.5,1.5) -- (-1,2.5) -- cycle;
+            \draw[line width=1.5pt] (0,0) -- (-1,2.5) -- (1.5,1) -- cycle;
+            \draw[line width=1.5pt] (-2.5,-1) -- (-1.5, -3) -- (0.5, -2) -- (0,0);
+            \fill (-2.5,-1) circle (4pt);
+            \fill (-3.5,1.5) circle (4pt);
+            \fill (-1,2.5) circle (4pt);
+            \fill (0,0) circle (4pt);
+            \fill (1.5,1) circle (4pt);
+            \fill (-1.5,-3) circle (4pt);
+            \fill (0.5,-2) circle (4pt);
+        \end{scope}
+    \end{tikzpicture}
+}
+
+% ================================
+% meta info setup
+% ================================
+\title[AI/ML Research]{Title of the Presentation}
+\subtitle{Subtitle or Conference Name}
+
+% config authors
+\def\authorOne{Nguyen Dinh Bang}
+\def\authorTwo{[Second Author]} % set to {} if none
+\def\authorThree{[Third Author]} % set to {} if none
+\def\emptyString{}
+
+\author[\authorOne]{
+    \textbf{\authorOne}
+    \ifx\authorTwo\emptyString\else \and \textbf{\authorTwo} \fi
+    \ifx\authorThree\emptyString\else \and \textbf{\authorThree} \fi
+}
+
+\institute[HCMUT]{
+    Faculty of Computer Science and Engineering \\
+    Ho Chi Minh City University of Technology (HCMUT)
+}
+% time (date). \today auto-fetches compile date. Replace with plain text (e.g., "June 21, 2026") if preferred.
+\date[\today]{\today}
+
+% title graphic
+\titlegraphic{
+    \begin{tikzpicture}[overlay, remember picture]
+        \begin{scope}[shift={(current page.north east)}, xshift=-2cm, yshift=-2cm, opacity=0.1, color=myprimary]
+            % larger elegant geometric mesh for the title
+            \draw[line width=2pt] (0,0) -- (-4,1) -- (-6,-3) -- (-2,-5) -- (2,-2) -- cycle;
+            \draw[line width=2pt] (0,0) -- (-2,-5);
+            \draw[line width=2pt] (-4,1) -- (2,-2);
+            \draw[line width=2pt] (-4,1) -- (-2,-5);
+            \fill (0,0) circle (6pt);
+            \fill (-4,1) circle (6pt);
+            \fill (-6,-3) circle (6pt);
+            \fill (-2,-5) circle (6pt);
+            \fill (2,-2) circle (6pt);
+        \end{scope}
+    \end{tikzpicture}
+}
+
+% ================================
+% custom title page layout
+% ================================
+\makeatletter
+\setbeamertemplate{title page}{
+  \begin{minipage}[b][\paperheight]{\textwidth}
+    \ifx\inserttitlegraphic\@empty\else\usebeamertemplate*{title graphic}\fi
+    \vfill%
+    \ifx\inserttitle\@empty\else\usebeamertemplate*{title}\fi
+    \ifx\insertsubtitle\@empty\else\usebeamertemplate*{subtitle}\fi
+    \usebeamertemplate*{title separator}
+    \ifx\beamer@shortauthor\@empty\else\usebeamertemplate*{author}\fi
+    \ifx\insertinstitute\@empty\else\usebeamertemplate*{institute}\vspace*{3mm}\fi
+    \vspace*{5mm}
+    \ifx\insertdate\@empty\else\usebeamertemplate*{date}\fi
+    \vfill
+    \vspace*{1mm}
+  \end{minipage}
+}
+\makeatother
+
+% ============================================================
+%                      BEGIN DOCUMENT
+% ============================================================
+\begin{document}
+
+% title
+\begin{frame}[plain, noframenumbering]
+    \titlepage
+\end{frame}
+
+% toc
+\begin{frame}{Outline}
+    \tableofcontents[hideallsubsections]
+\end{frame}
+
+% ============================================================
+%  SECTION 1: Introduction
+% ============================================================
+\section{Introduction}
+
+\begin{frame}{Motivation}
+    \begin{infobox}[\faExclamationTriangle \hspace{2pt} The Problem]
+        \begin{itemize}
+            \item Describe the core problem you are addressing.
+            \item Why is this problem important in AI/ML?
+            \item What are the limitations of current approaches?
+        \end{itemize}
+    \end{infobox}
+    
+    \vspace{0.3cm}
+    
+    \begin{infobox}[\faLightbulb \hspace{2pt} Our Contribution]
+        \begin{itemize}
+            \item Briefly state your proposed solution or main findings.
+            \item Highlight key improvements (e.g., accuracy, efficiency).
+        \end{itemize}
+    \end{infobox}
+\end{frame}
+
+% ============================================================
+%  SECTION 2: Background & Related Work
+% ============================================================
+\section{Background \& Related Work}
+
+\begin{frame}{Related Work}
+    \begin{itemize}
+        \item[\faBook] \textbf{Approach A [Smith et al., 2021]:} Solves X but struggles with Y.
+        % if biblatex enabled, use: \textbf{Approach A \footfullcite{smith2021}:} ...
+        \item[\faBook] \textbf{Approach B [Jones et al., 2022]:} Improves Y using technique Z, but is computationally expensive.
+    \end{itemize}
+    
+    \vspace{0.8cm}
+    
+    \begin{alertbox}[\faSearch \hspace{2pt} Gap in the Literature]
+        There is a need for a model that achieves high accuracy while remaining computationally efficient on edge devices.
+    \end{alertbox}
+\end{frame}
+
+% ============================================================
+%  SECTION 3: Proposed Methodology
+% ============================================================
+\section{Proposed Methodology}
+
+\begin{frame}{Methodology Overview}
+    \begin{itemize}
+        \item[\faCogs] Provide a high-level overview of your model architecture or algorithm.
+        \item[\faProjectDiagram] Use modern diagrams with shadow and clean edges.
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    \begin{figure}
+        \centering
+        % tkz nn architecture
+        \begin{tikzpicture}[node distance=2.8cm, auto,
+            box/.style={rectangle, draw=myprimary, top color=white, bottom color=myprimary!15, text width=2.5cm, text centered, rounded corners, minimum height=1.3cm, drop shadow},
+            arrow/.style={thick,->,>=stealth, myprimary}]
+            \node[box] (input) {\textbf{Input Data} \\ $\bm{X}$};
+            \node[box, right=of input] (model) {\textbf{AI Model} \\ $f_\theta$};
+            \node[box, right=of model] (output) {\textbf{Predictions} \\ $\hat{\bm{y}}$};
+            \draw[arrow] (input) -- (model) node[midway, above] {\small Features};
+            \draw[arrow] (model) -- (output) node[midway, above] {\small Softmax};
+        \end{tikzpicture}
+        \caption{High-level architecture of the proposed approach.}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Mathematical Formulation}
+    We optimize the parameters $\theta$ by minimizing the empirical risk. 
+    
+    \vspace{0.3cm}
+    
+    \begin{infobox}[\faCalculator \hspace{2pt} Objective Function]
+        \begin{equation}
+            \mathcal{L}(\theta) = \frac{1}{N} \sum_{i=1}^{N} \ell(f_\theta(\bm{x}_i), y_i) + \lambda \mathcal{R}(\theta)
+        \end{equation}
+        where:
+        \begin{itemize}
+            \item[\faAngleRight] $\ell(\cdot, \cdot)$ is the loss function (e.g., \alert{Cross-Entropy}).
+            \item[\faAngleRight] $\mathcal{R}(\theta)$ is the regularization term to prevent overfitting.
+            \item[\faAngleRight] $\lambda$ is the regularization hyperparameter.
+        \end{itemize}
+    \end{infobox}
+\end{frame}
+
+% ============================================================
+%  SECTION 4: Experiments & Results
+% ============================================================
+\section{Experiments \& Results}
+
+\begin{frame}{Experimental Setup}
+    \begin{columns}[T]
+        \begin{column}{.48\textwidth}
+            \begin{infobox}[\faDatabase \hspace{2pt} Datasets]
+                \begin{itemize}
+                    \item ImageNet-1K
+                    \item COCO 2017
+                    \item Custom Dataset
+                \end{itemize}
+            \end{infobox}
+        \end{column}%
+        \hfill%
+        \begin{column}{.48\textwidth}
+            \begin{infobox}[\faServer \hspace{2pt} Hardware \& Details]
+                \begin{itemize}
+                    \item 4x NVIDIA A100 GPUs
+                    \item PyTorch 2.0
+                    \item AdamW ($\text{lr}=10^{-4}$)
+                \end{itemize}
+            \end{infobox}
+        \end{column}%
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Results: Quantitative Comparison}
+    \begin{table}
+        \caption{Performance comparison on the benchmark dataset.}
+        \centering
+        \renewcommand{\arraystretch}{1.2}
+        \begin{tabular}{l c c c}
+            \toprule
+            \textbf{Method} & \textbf{Accuracy (\%)} & \textbf{F1-Score} & \textbf{Params (M)} \\
+            \midrule
+            Baseline 1 & 85.2 & 0.84 & 25.4 \\
+            Baseline 2 & 88.7 & 0.88 & 42.1 \\
+            \midrule
+            \rowcolor{mygreen!10}
+            \textbf{Ours} & \textbf{91.4} & \textbf{0.91} & \textbf{18.5} \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    \vspace{0.3cm}
+    \begin{center}
+        \alert{\faTrophy \hspace{2pt} Our model outperforms all baselines while requiring 27\% fewer parameters!}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Results: Visualizations}
+    \begin{figure}
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=0.85\textwidth,
+                height=5.5cm,
+                xlabel={Epochs},
+                ylabel={Loss},
+                xmin=0, xmax=50,
+                ymin=0, ymax=1.0,
+                legend style={at={(0.95,0.95)}, anchor=north east, draw=none, fill=white!80},
+                grid=both,
+                grid style={line width=.1pt, draw=gray!20},
+                axis x line*=bottom,
+                axis y line*=left
+            ]
+            \addplot[line width=1.5pt, myaccent] coordinates {(1, 0.9) (10, 0.4) (20, 0.2) (30, 0.15) (40, 0.1) (50, 0.08)};
+            \addlegendentry{Training Loss}
+            \addplot[line width=1.5pt, myprimary, dashed] coordinates {(1, 0.85) (10, 0.45) (20, 0.25) (30, 0.2) (40, 0.18) (50, 0.18)};
+            \addlegendentry{Validation Loss}
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Training and validation loss curve over 50 epochs.}
+    \end{figure}
+\end{frame}
+
+% ============================================================
+%  KEY TAKEAWAY (full-page impact slide before Conclusion)
+% ============================================================
+\begin{frame}[plain]
+    \begin{center}
+        \vspace{1.5cm}
+        {\fontsize{14}{16}\selectfont \textcolor{myprimary!60}{\faQuoteLeft}} \\
+        \vspace{0.5cm}
+        {\Large \textbf{Key Takeaway}} \\
+        \vspace{0.8cm}
+        \begin{minipage}{0.75\textwidth}
+            \begin{successbox}
+                \centering
+                \large Our method achieves \textbf{state-of-the-art} performance \\
+                with \textbf{27\% fewer parameters}, making it practical \\
+                for real-world edge deployment.
+            \end{successbox}
+        \end{minipage}
+    \end{center}
+\end{frame}
+
+% ============================================================
+%  SECTION 5: Conclusion
+% ============================================================
+\section{Conclusion}
+
+\begin{frame}{Conclusion \& Future Work}
+    \begin{successbox}[\faCheckCircle \hspace{2pt} Summary]
+        \begin{itemize}
+            \item We proposed a novel, lightweight approach for [Task].
+            \item Achieved state-of-the-art results on [Dataset].
+            \item Reduced computational overhead by $30\%$, enabling edge deployment.
+        \end{itemize}
+    \end{successbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{infobox}[\faRocket \hspace{2pt} Future Directions]
+        \begin{itemize}
+            \item Extend the framework to handle multimodal inputs (text + image).
+            \item Investigate theoretical bounds of the optimization landscape.
+        \end{itemize}
+    \end{infobox}
+\end{frame}
+
+% ============================================================
+%  THANK YOU SLIDE
+% ============================================================
+\begin{frame}[plain, noframenumbering]
+    \begin{center}
+        \vspace{2cm}
+        \begin{tikzpicture}
+            \fill[myprimary!5] (0,0) circle (1.5cm);
+            \node[inner sep=0pt, text=myprimary] at (0,0) {\fontsize{50}{50}\selectfont \faHandshake};
+        \end{tikzpicture}
+        
+        \vspace{0.8cm}
+        {\Huge \textbf{\textcolor{myprimary}{Thank You!}}} \\
+        \vspace{0.3cm}
+        {\large Questions \& Discussion}
+    \end{center}
+\end{frame}
+
+% ============================================================
+%  APPENDIX / BACKUP SLIDES
+%  (these slides are NOT counted in the main page numbering)
+% Author: Bang Nguyen Dinh (github/bawfng04)
+% ============================================================
+\appendix
+
+\begin{frame}[plain, noframenumbering]
+    \begin{center}
+        \vspace{2.5cm}
+        {\Huge \textbf{\textcolor{myprimary}{Appendix}}} \\
+        \vspace{0.3cm}
+        {\large Backup Slides}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Ablation Study}
+    \begin{table}
+        \caption{Ablation study on key components of our model.}
+        \centering
+        \renewcommand{\arraystretch}{1.2}
+        \begin{tabular}{l c c}
+            \toprule
+            \textbf{Configuration} & \textbf{Accuracy (\%)} & \textbf{$\Delta$} \\
+            \midrule
+            Full Model & \textbf{91.4} & --- \\
+            w/o Component A & 89.1 & $-2.3$ \\
+            w/o Component B & 87.5 & $-3.9$ \\
+            w/o Component A \& B & 85.0 & $-6.4$ \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+\end{frame}
+
+\begin{frame}{Hyperparameter Sensitivity}
+    \begin{infobox}[\faSlidersH \hspace{2pt} Key Hyperparameters]
+        \renewcommand{\arraystretch}{1.2}
+        \begin{tabular}{l l l}
+            \toprule
+            \textbf{Hyperparameter} & \textbf{Search Range} & \textbf{Optimal} \\
+            \midrule
+            Learning Rate & $\{10^{-5}, 10^{-4}, 10^{-3}\}$ & $10^{-4}$ \\
+            Batch Size & $\{16, 32, 64, 128\}$ & 64 \\
+            Weight Decay & $\{0, 10^{-4}, 10^{-2}\}$ & $10^{-4}$ \\
+            Dropout & $\{0.0, 0.1, 0.3, 0.5\}$ & 0.1 \\
+            \bottomrule
+        \end{tabular}
+    \end{infobox}
+\end{frame}
+
+\end{document}

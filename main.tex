@@ -19,11 +19,8 @@
 \setbeamercolor{progress bar}{fg=myaccent,bg=myprimary!50}
 \setbeamercolor{alerted text}{fg=myaccent}
 
-% footer with page numbers & decorative line
+% footer with page numbers
 \setbeamertemplate{footline}{%
-    \begin{tikzpicture}[overlay]
-        \draw[myprimary, line width=0.4pt] (0,0.45) -- (\paperwidth,0.45);
-    \end{tikzpicture}
     \hfill%
     \usebeamerfont{page number in head/foot}%
     \textcolor{myprimary!70}{\insertframenumber\,/\,\inserttotalframenumber}%
@@ -182,19 +179,10 @@
         \item[\faProjectDiagram] Use modern diagrams with shadow and clean edges.
     \end{itemize}
     
-    \vspace{0.5cm}
+    \vspace{0.2cm}
     \begin{figure}
         \centering
-        % tkz nn architecture
-        \begin{tikzpicture}[node distance=2.8cm, auto,
-            box/.style={rectangle, draw=myprimary, top color=white, bottom color=myprimary!15, text width=2.5cm, text centered, rounded corners, minimum height=1.3cm, drop shadow},
-            arrow/.style={thick,->,>=stealth, myprimary}]
-            \node[box] (input) {\textbf{Input Data} \\ $\bm{X}$};
-            \node[box, right=of input] (model) {\textbf{AI Model} \\ $f_\theta$};
-            \node[box, right=of model] (output) {\textbf{Predictions} \\ $\hat{\bm{y}}$};
-            \draw[arrow] (input) -- (model) node[midway, above] {\small Features};
-            \draw[arrow] (model) -- (output) node[midway, above] {\small Softmax};
-        \end{tikzpicture}
+        \includegraphics[width=0.85\textwidth, height=0.6\textheight, keepaspectratio]{figures/placeholder_01.png}
         \caption{High-level architecture of the proposed approach.}
     \end{figure}
 \end{frame}
@@ -272,27 +260,8 @@
 \begin{frame}{Results: Visualizations}
     \begin{figure}
         \centering
-        \begin{tikzpicture}
-            \begin{axis}[
-                width=0.85\textwidth,
-                height=5.5cm,
-                xlabel={Epochs},
-                ylabel={Loss},
-                xmin=0, xmax=50,
-                ymin=0, ymax=1.0,
-                legend style={at={(0.95,0.95)}, anchor=north east, draw=none, fill=white!80},
-                grid=both,
-                grid style={line width=.1pt, draw=gray!20},
-                axis x line*=bottom,
-                axis y line*=left
-            ]
-            \addplot[line width=1.5pt, myaccent] coordinates {(1, 0.9) (10, 0.4) (20, 0.2) (30, 0.15) (40, 0.1) (50, 0.08)};
-            \addlegendentry{Training Loss}
-            \addplot[line width=1.5pt, myprimary, dashed] coordinates {(1, 0.85) (10, 0.45) (20, 0.25) (30, 0.2) (40, 0.18) (50, 0.18)};
-            \addlegendentry{Validation Loss}
-            \end{axis}
-        \end{tikzpicture}
-        \caption{Training and validation loss curve over 50 epochs.}
+        \includegraphics[width=0.85\textwidth, height=0.6\textheight, keepaspectratio]{figures/placeholder_02.png}
+        \caption{Experimental results showing math delta chart.}
     \end{figure}
 \end{frame}
 

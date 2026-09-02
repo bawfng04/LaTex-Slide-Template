@@ -1,11 +1,8 @@
 % pkg config
 
-% req pkgs
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage[english]{babel}
+\usepackage[utf8]{vietnam}
 
-% clean modern font (available in all LaTeX distributions)
+% clean modern font
 \usepackage{lmodern}
 
 % math stuff
@@ -22,10 +19,11 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{array}
+\usepackage{colortbl}
 
 % draw nn & charts
 \usepackage{tikz}
-\usetikzlibrary{shapes, arrows.meta, positioning, calc, shadows, decorations.pathreplacing, backgrounds}
+\usetikzlibrary{shapes, arrows.meta, positioning, calc, shadows, decorations.pathreplacing, backgrounds, fit}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 
@@ -39,10 +37,6 @@
 % premium ui blocks
 \usepackage[most]{tcolorbox}
 
-% biblio (uncomment & add references.bib to enable)
-%\usepackage[backend=biber,style=authoryear,maxnames=2,natbib=true]{biblatex}
-%\addbibresource{references.bib}
-
 % appendix section helper
 \usepackage{appendixnumberbeamer}
 
@@ -51,9 +45,13 @@
 \definecolor{myaccent}{HTML}{0D9488}  % teal
 \definecolor{mygreen}{HTML}{059669}   % emerald
 \definecolor{mygrey}{HTML}{F1F5F9}    % slate grey
+\definecolor{myalert}{HTML}{DC2626}   % crimson red
+\definecolor{myorange}{HTML}{D97706}  % amber orange
+\definecolor{mypurple}{HTML}{6D28D9}  % deep violet
+\definecolor{codebg}{HTML}{F8FAFC}    % ultra light slate
 
 % ============================================================
-% tcolorbox ui components
+% tcolorbox ui components (compact for beamer presentation)
 % ============================================================
 
 % modern info block
@@ -61,13 +59,12 @@
     enhanced,
     colback=myprimary!4,
     colframe=myprimary,
-    boxrule=0.5pt,
-    leftrule=3.5pt,
-    arc=3pt,
-    boxsep=2pt,
-    top=4pt,bottom=4pt,left=6pt,right=6pt,
-    drop fuzzy shadow,
-    fonttitle=\bfseries,
+    boxrule=0.6pt,
+    leftrule=3pt,
+    arc=2pt,
+    boxsep=1pt,
+    top=2.5pt,bottom=2.5pt,left=4.5pt,right=4.5pt,
+    fonttitle=\bfseries\footnotesize,
     coltitle=myprimary,
     colbacktitle=myprimary!4,
     title=#1
@@ -78,13 +75,12 @@
     enhanced,
     colback=myaccent!5,
     colframe=myaccent,
-    boxrule=0.5pt,
-    leftrule=3.5pt,
-    arc=3pt,
-    boxsep=2pt,
-    top=4pt,bottom=4pt,left=6pt,right=6pt,
-    drop fuzzy shadow,
-    fonttitle=\bfseries,
+    boxrule=0.6pt,
+    leftrule=3pt,
+    arc=2pt,
+    boxsep=1pt,
+    top=2.5pt,bottom=2.5pt,left=4.5pt,right=4.5pt,
+    fonttitle=\bfseries\footnotesize,
     coltitle=myaccent,
     colbacktitle=myaccent!5,
     title=#1
@@ -95,14 +91,108 @@
     enhanced,
     colback=mygreen!4,
     colframe=mygreen,
-    boxrule=0.5pt,
-    leftrule=3.5pt,
-    arc=3pt,
-    boxsep=2pt,
-    top=4pt,bottom=4pt,left=6pt,right=6pt,
-    drop fuzzy shadow,
-    fonttitle=\bfseries,
+    boxrule=0.6pt,
+    leftrule=3pt,
+    arc=2pt,
+    boxsep=1pt,
+    top=2.5pt,bottom=2.5pt,left=4.5pt,right=4.5pt,
+    fonttitle=\bfseries\footnotesize,
     coltitle=mygreen,
     colbacktitle=mygreen!4,
     title=#1
+}
+
+% modern warn block (red/amber)
+\newtcolorbox{warnbox}[1][]{
+    enhanced,
+    colback=myalert!5,
+    colframe=myalert,
+    boxrule=0.6pt,
+    leftrule=3pt,
+    arc=2pt,
+    boxsep=1pt,
+    top=2.5pt,bottom=2.5pt,left=4.5pt,right=4.5pt,
+    fonttitle=\bfseries\footnotesize,
+    coltitle=myalert,
+    colbacktitle=myalert!5,
+    title=#1
+}
+
+% ============================================================
+% listings formatting setup (Modern IDE Syntax Theme)
+% ============================================================
+
+\definecolor{jsonkey}{HTML}{1E40AF}    % Deep Blue for structure
+\definecolor{jsonstring}{HTML}{0D9488} % Teal for string values
+\definecolor{jsonnumber}{HTML}{D97706} % Amber/Orange for numbers
+\definecolor{jsonbool}{HTML}{7C3AED}   % Violet for booleans/null
+\definecolor{jsoncomment}{HTML}{64748B}% Slate for comments
+\definecolor{jsonframe}{HTML}{CBD5E1}  % Crisp border
+
+\lstset{
+    basicstyle=\ttfamily\fontsize{5.5}{6.8}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    showstringspaces=false,
+    frame=single,
+    frameround=tttt,
+    framesep=3pt,
+    rulecolor=\color{jsonframe},
+    backgroundcolor=\color{codebg},
+    tabsize=2,
+    captionpos=b
+}
+
+\lstdefinelanguage{json}{
+    basicstyle=\ttfamily\fontsize{5.2}{6.5}\selectfont,
+    columns=fullflexible,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    frameround=tttt,
+    framesep=3pt,
+    rulecolor=\color{jsonframe},
+    backgroundcolor=\color{codebg},
+    comment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    commentstyle=\color{jsoncomment}\itshape,
+    morestring=[b]",
+    stringstyle=\color{jsonstring}\bfseries,
+    keywords={true, false, null},
+    keywordstyle=\color{jsonbool}\bfseries,
+    literate=*
+     {0}{{{\color{jsonnumber}0}}}{1}
+     {1}{{{\color{jsonnumber}1}}}{1}
+     {2}{{{\color{jsonnumber}2}}}{1}
+     {3}{{{\color{jsonnumber}3}}}{1}
+     {4}{{{\color{jsonnumber}4}}}{1}
+     {5}{{{\color{jsonnumber}5}}}{1}
+     {6}{{{\color{jsonnumber}6}}}{1}
+     {7}{{{\color{jsonnumber}7}}}{1}
+     {8}{{{\color{jsonnumber}8}}}{1}
+     {9}{{{\color{jsonnumber}9}}}{1}
+     {:}{{{\textcolor{myprimary}{\textbf{:}}}}}{1}
+     {,}{{{\textcolor{darkgray}{,}}}}{1}
+     {\{}{{{\textcolor{myprimary}{\textbf{\{}}}}}{1}
+     {\}}{{{\textcolor{myprimary}{\textbf{\}}}}}}{1}
+     {[}{{{\textcolor{myprimary}{\textbf{[}}}}}{1}
+     {]}{{{\textcolor{myprimary}{\textbf{]}}}}}{1}
+}
+
+\lstdefinelanguage{sql}{
+    basicstyle=\ttfamily\fontsize{5.2}{6.5}\selectfont,
+    columns=fullflexible,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    frameround=tttt,
+    framesep=3pt,
+    rulecolor=\color{jsonframe},
+    backgroundcolor=\color{codebg},
+    comment=[l]{--},
+    commentstyle=\color{jsoncomment}\itshape,
+    morestring=[b]',
+    stringstyle=\color{jsonstring},
+    morekeywords={CREATE, TABLE, PRIMARY, KEY, NOT, NULL, DEFAULT, TEXT, INTEGER, BLOB, PRAGMA, VACUUM, journal_mode, wal_autocheckpoint, DELETE},
+    keywordstyle=\color{myprimary}\bfseries
 }

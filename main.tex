@@ -363,6 +363,39 @@
     \end{columns}
 \end{frame}
 
+\begin{frame}{Thực Tế Hugging Face: Bùng Nổ Biến Thể \& Nhầm Lẫn Định Danh}
+    \begin{columns}[onlytextwidth, T]
+        \begin{column}{0.58\textwidth}
+            \textbf{\textcolor{myalert}{\faSearch \ 6.899 Repos Phái Sinh Khớp \texttt{bert-base-uncased}}}\\[3pt]
+            \begin{center}
+                {\setlength{\fboxsep}{1pt}\fcolorbox{myalert!40}{white}{\includegraphics[width=\linewidth, height=0.60\textheight, keepaspectratio]{figures/case_multirepo_fanout_bert.png}}}
+            \end{center}
+        \end{column}
+        \hfill
+        \begin{column}{0.40\textwidth}
+            \begin{warnbox}[{\faExclamationTriangle \ Bùng Nổ Mô Hình Phái Sinh}]
+                \scriptsize
+                6.899 kết quả cùng tên gốc \texttt{bert} nhưng:
+                \begin{itemize}
+                    \tiny
+                    \item \textbf{Mirror / Clone}: Trùng 100\% hash weights gốc.
+                    \item \textbf{File phụ}: \texttt{tokenizer.json} dùng chung ở 1.037 repos.
+                    \item \textbf{Finetune}: Đã sửa weights, mang hash mới.
+                \end{itemize}
+            \end{warnbox}
+            \vspace{-0.1cm}
+            \begin{infobox}[{\faShield* \ Giải Pháp: Bắt Buộc Dùng Hash}]
+                \scriptsize
+                \begin{itemize}
+                    \tiny
+                    \item \textbf{Băm nhị phân}: Phân định rạch ròi Exact match vs Finetune (không đoán mò theo tên web).
+                    \item \textbf{Candidates list}: Lưu toàn bộ repo trùng hash để kiểm toán bản quyền minh bạch.
+                \end{itemize}
+            \end{infobox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
 \begin{frame}{Kiến Trúc SQLite 2 Tầng: Tách Biệt Raw Data \& Cache}
     \begin{figure}
         \centering

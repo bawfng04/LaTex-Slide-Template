@@ -89,9 +89,9 @@
             \begin{alertbox}[{\faExclamationCircle \hspace{2pt} Thực Trạng}]
                 \scriptsize
                 \begin{itemize}
-                    \item 0 có registry chuẩn (như npm/Cargo) $\to$ model upload tự do.
-                    \item File weights bị re-upload khắp nơi $\to$ metadata lệch pha.
-                    \item Model Card tác giả tự gõ tay $\to$ 0 ai kiểm chứng.
+                    \item Không có centralized registry cố định $\to$ mô hình được phân phối mở.
+                    \item Model weights bị re-upload diện rộng $\to$ metadata phân mảnh và bất đồng.
+                    \item Model Card khai báo thủ công $\to$ thiếu cơ chế xác minh tự động.
                 \end{itemize}
             \end{alertbox}
         \end{column}
@@ -100,8 +100,8 @@
             \begin{successbox}[{\faShield* \hspace{2pt} Đề Xuất}]
                 \scriptsize
                 \begin{itemize}
-                    \item \textbf{4 mức tin cậy}: Đo trực tiếp từ file binary > Lời khai trên web.
-                    \item \textbf{SQLite 2 tầng}: Tải data 1 lần, scan 100\% offline (0 cần mạng).
+                    \item \textbf{4 cấp Evidence Class}: Đo đạc cấu trúc binary trực tiếp > Declared metadata.
+                    \item \textbf{SQLite 2 tầng}: Offline replayability, quét hoàn toàn độc lập với mạng.
                     \item \textbf{CycloneDX 1.6}: Chuẩn hóa quốc tế, minh bạch evidence.
                 \end{itemize}
             \end{successbox}
@@ -123,11 +123,11 @@
             \toprule
             \textbf{Tiêu chí} & \textbf{Software SBOM (npm/Cargo)} & \textbf{AI-BOM (Hugging Face/GGUF)} \\
             \midrule
-            \textbf{1. Phân phối} & Registry tập trung, version bất biến & Hub mở, ai cũng fork/re-upload được \\
+            \textbf{1. Phân phối} & Registry tập trung, version bất biến & Hub phân phối mở, weights được tái chia sẻ diện rộng \\
             \textbf{2. Bản chất File} & Source code / text đọc được & Matrix weights nhị phân lớn (GB--TB) \\
             \textbf{3. Quan hệ Hash} & 1 Version $\leftrightarrow$ 1 SHA-256 duy nhất & \textbf{1 Hash $\to$ 1,037 Repos} (Trùng lặp lớn) \\
-            \textbf{4. Metadata} & Khai báo chuẩn qua lockfile & YAML Model Card tự gõ tay \\
-            \textbf{5. License} & SPDX rõ ràng, chuẩn 1--1 & Tranh chấp license giữa repo gốc và fork \\
+            \textbf{4. Metadata} & Khai báo chuẩn qua lockfile & YAML Model Card khai báo thủ công \\
+            \textbf{5. License} & SPDX rõ ràng, chuẩn 1--1 & Conflict license giữa repo gốc và các bản re-upload \\
             \bottomrule
         \end{tabular}
     \end{table}
@@ -170,12 +170,12 @@
 
         % AI-BOM Resolution Process
         \node[draw=mygreen, fill=mygreen!6, rounded corners=4pt, text width=4.8cm, align=left, drop shadow] (aibom) at (10.2, 0) {
-            \textbf{\faShield* \ \textcolor{mygreen}{Quy Trình Xử Lý AI-BOM}}\\[2pt]
-            \tiny $\bullet$ \textbf{1. Gom Đủ Candidates}: Khớp hash binary $\to$ tìm thấy cả 3 repos trong Layer 2 Cache.\\[2pt]
-            \tiny $\bullet$ \textbf{2. Nhận Diện Xung Đột}: So sánh thuộc tính $\to$ xác định xung đột bản quyền (\texttt{Conflicting}).\\[2pt]
-            \tiny $\bullet$ \textbf{3. An Toàn Pháp Lý}: Tuyệt đối không đoán mò một license duy nhất:\\
-            \tiny \ \ \ -- Điền \texttt{licenses: []} (để trống slot chính)\\
-            \tiny \ \ \ -- Đẩy đủ 3 claims vào \texttt{evidence.licenses[]}
+            \textbf{\faShield* \ \textcolor{mygreen}{Quy Trình Resolution Của AI-BOM}}\\[2pt]
+            \tiny $\bullet$ \textbf{1. Tập Hợp Candidates}: Khớp hash binary $\to$ định danh 3 repos trong Layer 2 Cache.\\[2pt]
+            \tiny $\bullet$ \textbf{2. Phát Hiện Conflict}: So sánh metadata $\to$ nhận diện trạng thái \texttt{Conflicting}.\\[2pt]
+            \tiny $\bullet$ \textbf{3. Bảo Đảm An Toàn Pháp Lý}: Tuyệt đối không suy đoán một license duy nhất:\\
+            \tiny \ \ \ -- Withholding native slot (\texttt{licenses: []})\\
+            \tiny \ \ \ -- Lưu đủ 3 claims độc lập vào \texttt{evidence.licenses[]}
         };
 
         \draw[->, line width=1pt, mygreen] (repoA.east) -- (aibom.west);
@@ -187,7 +187,7 @@
     \vspace{-0.2cm}
     \begin{infobox}[{\faLightbulb \hspace{2pt} Nguyên Tắc An Toàn Pháp Lý}]
         \scriptsize
-        Khi một file nhị phân trỏ về nhiều repos có bản quyền mâu thuẫn, scanner giữ sự trung thực tuyệt đối của bằng chứng: để trống kết luận phán đoán và cung cấp đủ dữ liệu đối soát để bảo vệ khách hàng.
+        Khi phát hiện conflict bản quyền giữa các candidates của cùng một model weights, hệ thống áp dụng withholding cho native slot và lưu giữ đầy đủ claims trong evidence phục vụ kiểm toán độc lập.
     \end{infobox}
 \end{frame}
 
@@ -196,11 +196,11 @@
         \begin{column}{0.48\textwidth}
             \begin{infobox}[{\faFingerprint \hspace{2pt} 1. Định Danh Theo File Thực Tế}]
                 \scriptsize
-                Tính danh tính từ hash binary thật, không tin vào đường dẫn file.
+                Tính danh tính từ hash binary thật, không dựa vào đường dẫn tệp.
             \end{infobox}
-            \begin{infobox}[{\faSearchLocation \hspace{2pt} 2. Rõ Ràng Nguồn Gốc}]
+            \begin{infobox}[{\faSearchLocation \hspace{2pt} 2. Minh Bạch Provenance}]
                 \scriptsize
-                Mọi thông tin đều ghi rõ lấy từ đâu (\texttt{local\_binary}, \texttt{hf\_card}).
+                Ghi nhận xuất xứ dữ liệu (provenance) tường minh qua từng nguồn (\texttt{local\_binary}, \texttt{hf\_card}).
             \end{infobox}
         \end{column}
         \hfill
@@ -211,14 +211,14 @@
             \end{infobox}
             \begin{infobox}[{\faEquals \hspace{2pt} 5. Kết Quả Tất Định}]
                 \scriptsize
-                Cùng input $\to$ output JSON trùng 100\% (RFC 9562 UUIDv8).
+                Cùng input $\to$ output JSON trùng byte-for-byte (RFC 9562 UUIDv8).
             \end{infobox}
         \end{column}
     \end{columns}
     \vspace{0.05cm}
-    \begin{alertbox}[{\faBan \hspace{2pt} 3. Không Chắc Thì Từ Chối - Tuyệt Đối Không Đoán Mò}]
+    \begin{alertbox}[{\faBan \hspace{2pt} 3. Nguyên Tắc Withholding \& Zero-Guesswork}]
         \scriptsize
-        Thiếu bằng chứng hoặc mâu thuẫn $\to$ để trống hoặc ghi \texttt{withheld}, không tự bịa dữ liệu.
+        Khi thiếu bằng chứng xác thực hoặc phát hiện conflict $\to$ áp dụng withholding (\texttt{withheld}), không suy đoán dữ liệu.
     \end{alertbox}
 \end{frame}
 
@@ -227,14 +227,14 @@
         \centering
         \scriptsize
         \renewcommand{\arraystretch}{1.08}
-        \begin{tabular}{c p{0.28\textwidth} p{0.56\textwidth}}
+        \begin{tabular}{c p{0.30\textwidth} p{0.54\textwidth}}
             \toprule
             \textbf{\#} & \textbf{Nguyên Tắc Bất Biến} & \textbf{Mục Đích \& Hành Vi Kỹ Thuật} \\
             \midrule
-            \textbf{1} & \textbf{Quét Offline 100\%} & Rebuild toàn bộ Cache L2 từ Raw L1 với \textbf{0 request mạng}. \\
-            \textbf{2} & \textbf{Minh Bạch Bằng Chứng} & Output JSON luôn chứa cả \texttt{claims[]} thô và kết luận chốt. \\
-            \textbf{3} & \textbf{Không Đoán Mò} & Dữ liệu mâu thuẫn $\to$ giữ nguyên tranh chấp, 0 tự ý chọn 1 bên. \\
-            \textbf{4} & \textbf{Core Không Dính Mạng} & Crate \texttt{aibom-core} hoàn toàn 0 chứa code gọi mạng. \\
+            \textbf{1} & \textbf{Offline Replayability} & Rebuild toàn bộ Cache L2 từ Raw L1 với \textbf{0 request mạng}. \\
+            \textbf{2} & \textbf{Minh Bạch Bằng Chứng} & Output JSON luôn chứa cả \texttt{claims[]} thô và kết luận resolution. \\
+            \textbf{3} & \textbf{Zero-Guesswork} & Dữ liệu conflict $\to$ duy trì trạng thái tranh chấp, không suy đoán chủ quan. \\
+            \textbf{4} & \textbf{Zero-Network Core} & Crate \texttt{aibom-core} độc lập hoàn toàn với network stack. \\
             \textbf{5} & \textbf{Loại Bỏ File Rỗng} & Bỏ qua hash file 0-byte khi tính danh tính weight set của model. \\
             \textbf{6} & \textbf{Đối Chiếu An Toàn} & Chỉ nạp config ngoài khi thư mục chỉ chứa đúng 1 model. \\
             \bottomrule
@@ -250,28 +250,26 @@
 \begin{frame}{Số Liệu Thực Tế Khi Crawl 50.000 Models (\texttt{data/poc-50k})}
     \begin{columns}[onlytextwidth, T]
         \begin{column}{0.54\textwidth}
-            \setlength{\tabcolsep}{2.5pt}
-            \begin{table}
-                \centering
-                \scriptsize
-                \renewcommand{\arraystretch}{1.05}
-                \begin{tabular}{l r r}
-                    \toprule
-                    \textbf{Chỉ số đo đạc} & \textbf{Dataset 20k} & \textbf{Dataset 50k (Hiện tại)} \\
-                    \midrule
-                    Tổng số Models & 19,998 & \textbf{49,992 / 50,000} \\
-                    Tổng số File Hashes & 268,052 & \textbf{798,682 hashes} \\
-                    File Weights & 267,979 & \textbf{705,158} (93.85\%) \\
-                    Distinct Weight Sets & 19,235 & \textbf{47,854 sets} \\
-                    Hash trùng đa Repo & 6.10\% & \textbf{5.11\%} (max 1,037) \\
-                    Repo đa nhóm Weight & 57.4\% & \textbf{65.1\% repos} \\
-                    Dung lượng DB L2 & ~360 MB & \textbf{~912 MB} (18 KB/model) \\
-                    \bottomrule
-                \end{tabular}
-            \end{table}
+            \centering
+            \resizebox{\columnwidth}{!}{
+            \renewcommand{\arraystretch}{1.08}
+            \begin{tabular}{l r r}
+                \toprule
+                \textbf{Chỉ số đo đạc} & \textbf{Dataset 20k} & \textbf{Dataset 50k (Hiện tại)} \\
+                \midrule
+                Tổng số Models & 19,998 & \textbf{49,992 / 50,000} \\
+                Tổng số File Hashes & 268,052 & \textbf{798,682 hashes} \\
+                File Weights & 267,979 & \textbf{705,158} (93.85\%) \\
+                Distinct Weight Sets & 19,235 & \textbf{47,854 sets} \\
+                Hash trùng đa Repo & 6.10\% & \textbf{5.11\%} (max 1,037) \\
+                Repo đa nhóm Weight & 57.4\% & \textbf{65.1\% repos} \\
+                Dung lượng DB L2 & $\approx$360 MB & \textbf{$\approx$912 MB} (18 KB/model) \\
+                \bottomrule
+            \end{tabular}
+            }
         \end{column}
         \hfill
-        \begin{column}{0.42\textwidth}
+        \begin{column}{0.40\textwidth}
             \begin{infobox}[{\faChartPie \hspace{2pt} Nhận Xét Thực Tế}]
                 \scriptsize
                 \begin{itemize}
@@ -286,9 +284,9 @@
 \begin{frame}{Những "Bẫy Dữ Liệu" Trên Hugging Face Hub}
     \begin{columns}[onlytextwidth, T]
         \begin{column}{0.48\textwidth}
-            \begin{warnbox}[{\faFile \hspace{2pt} 1. README Lộn Xộn}]
+            \begin{warnbox}[{\faFile \hspace{2pt} 1. README Không Chuẩn Hóa}]
                 \scriptsize
-                Tác giả dán cả bài báo vào YAML $\to$ file phình to hàng chục MB dữ liệu rác.
+                Tác giả nhúng toàn văn bài báo vào YAML $\to$ metadata phình to hàng chục MB văn bản phi cấu trúc.
             \end{warnbox}
             \begin{warnbox}[{\faCompress \hspace{2pt} 2. File Dùng Chung Trùng Hàng Nghìn Repo}]
                 \scriptsize
@@ -297,13 +295,13 @@
         \end{column}
         \hfill
         \begin{column}{0.48\textwidth}
-            \begin{warnbox}[{\faExchange* \hspace{2pt} 3. Mâu Thuẫn Trong Cùng 1 Repo}]
+            \begin{warnbox}[{\faExchange* \hspace{2pt} 3. Conflict Trong Cùng 1 Repo}]
                 \scriptsize
                 Cùng 1 model: Tags ngoài ghi \texttt{Apache-2.0} nhưng Card trong ghi \texttt{MIT}.
             \end{warnbox}
             \begin{warnbox}[{\faLayerGroup \hspace{2pt} 4. 1 Repo Chứa Nhiều Model Con}]
                 \scriptsize
-                1 repo chứa 7 file GGUF lượng tử hóa khác nhau (Q2, Q4, FP16).
+                1 repo chứa 7 file GGUF quantization khác nhau (Q2, Q4, FP16).
             \end{warnbox}
         \end{column}
     \end{columns}
@@ -341,7 +339,7 @@
             
             % Wide arrows with centered labels
             \draw[->, line width=1.4pt, myprimary] (L1.east) -- (L2.west);
-            \node[above=4pt, align=center, font=\scriptsize\bfseries, text=myprimary] at ($(L1.east)!0.5!(L2.west)$) {Rebuild Offline\\[2pt]\fontsize{6.5}{7.5}\selectfont (0 request mạng)};
+            \node[above=4pt, align=center, font=\scriptsize\bfseries, text=myprimary] at ($(L1.east)!0.5!(L2.west)$) {Offline Replay\\[2pt]\fontsize{6.5}{7.5}\selectfont (0 request mạng)};
             
             \draw[->, line width=1.4pt, myaccent] (L2.east) -- (L3.west);
             \node[above=4pt, align=center, font=\scriptsize\bfseries, text=myaccent] at ($(L2.east)!0.5!(L3.west)$) {Read-Only\\[2pt]\fontsize{6.5}{7.5}\selectfont (Query $<1\text{ms}$)};
@@ -353,49 +351,56 @@
         \scriptsize
         \begin{itemize}
             \item \textbf{Gọn nhẹ}: DB phân phối kèm scanner chỉ nặng ~912 MB (~18 KB/model).
-            \item \textbf{Rebuild siêu nhanh hoàn toàn offline}: Khi đổi rule normalize, rebuild L2 từ L1 trong vài phút, 0 cần crawl lại mạng.
+            \item \textbf{Offline Replayability}: Khi cập nhật quy tắc chuẩn hóa, rebuild L2 từ L1 trong vài phút, 0 cần thu thập lại qua mạng.
         \end{itemize}
     \end{infobox}
 \end{frame}
 
-\begin{frame}{Sơ Đồ Trực Quan: Chu Trình "Cào Dữ Liệu Một Lần, Tái Cấu Trúc Mãi Mãi"}
+\begin{frame}{Sơ Đồ Trực Quan: Cơ Chế Offline Replayability (Layer 1 $\to$ Layer 2)}
     \begin{center}
     \resizebox{0.96\textwidth}{!}{
     \begin{tikzpicture}[auto, >=Latex, font=\scriptsize]
         % Top comparison: 1-tier
-        \node[draw=myalert, fill=myalert!10, rounded corners=3pt, text width=2.4cm, align=center] (api1) at (0, 1.4) {
-            \textbf{\faGlobe \ Web API}\\
+        \node[draw=myalert, fill=myalert!8, rounded corners=4pt, text width=2.2cm, minimum height=1.5cm, align=center] (api1) at (-0.9, 1.45) {
+            \textbf{\faGlobe \ Web API}\\[2pt]
             \tiny Hugging Face Hub
         };
-        \node[draw=myalert, fill=myalert!10, rounded corners=3pt, text width=2.6cm, align=center] (db1) at (7.6, 1.4) {
-            \textbf{\faDatabase \ Cào Trực Tiếp}\\
-            \tiny SQLite Scanner
+        \node[draw=myalert, fill=myalert!8, rounded corners=4pt, text width=2.8cm, minimum height=1.5cm, align=center] (db1) at (10.5, 1.45) {
+            \textbf{\faDatabase \ Ingestion Đơn Tầng}\\[2pt]
+            \tiny SQLite Scanner Cục Bộ
         };
-        \draw[->, line width=1.2pt, myalert] (api1) -- node[above, font=\tiny\bfseries, text=myalert] {Cào Mạng (6--8 tiếng)} node[below, font=\tiny, text=black!70] {Đổi luật chuẩn hóa $\to$ Bắt buộc cào lại mạng từ đầu!} (db1);
-        \node[draw=myalert, fill=myalert!20, circle, inner sep=2pt] at (10.4, 1.4) {\textbf{\textcolor{myalert}{\faTimes}}};
+        \draw[->, line width=1.3pt, myalert] (api1.east) -- 
+            node[above=3pt, font=\tiny\bfseries, text=myalert, align=center] {Thu Thập Trực Tiếp (6--8 tiếng)} 
+            node[below=3pt, font=\tiny, text=black!70, align=center] {Thay đổi quy tắc chuẩn hóa $\to$ Bắt buộc nạp lại từ đầu qua mạng!} (db1.west);
+        \node[draw=myalert, fill=myalert!20, circle, inner sep=2.5pt] at (12.5, 1.45) {\normalsize \textcolor{myalert}{\faTimes}};
 
         % Separator
-        \draw[dashed, line width=0.8pt, black!30] (-1.5, 0.35) -- (11.2, 0.35);
+        \draw[dashed, line width=0.8pt, black!25] (-2.2, 0.3) -- (13.2, 0.3);
 
         % Bottom: 2-tier architecture
-        \node[draw=mygreen, fill=mygreen!10, rounded corners=3pt, text width=2.4cm, align=center] (api2) at (0, -0.8) {
-            \textbf{\faGlobe \ Web API}\\
+        \node[draw=mygreen, fill=mygreen!8, rounded corners=4pt, text width=2.2cm, minimum height=1.8cm, align=center] (api2) at (-0.9, -1.0) {
+            \textbf{\faGlobe \ Web API}\\[2pt]
             \tiny Hugging Face Hub
         };
-        \node[draw=myprimary, fill=myprimary!10, rounded corners=3pt, text width=2.5cm, align=center] (l1) at (4.0, -0.8) {
-            \textbf{\faArchive \ Layer 1}\\
-            \tiny \texttt{aibom\_raw.sqlite} (4 GB)\\[1pt]
-            \tiny Lưu JSON thô 1 lần
+        \node[draw=myprimary, fill=myprimary!10, rounded corners=4pt, text width=2.6cm, minimum height=1.8cm, align=center, drop shadow] (l1) at (4.2, -1.0) {
+            \textbf{\faArchive \ Layer 1: Raw}\\[2pt]
+            \texttt{\textbf{aibom\_raw.sqlite}}\\[1pt]
+            \tiny ($\approx$4 GB) $\bullet$ Lưu 1 lần\\[2pt]
+            \tiny Raw JSON Ingestion
         };
-        \node[draw=myaccent, fill=myaccent!10, rounded corners=3pt, text width=2.5cm, align=center] (l2) at (8.4, -0.8) {
-            \textbf{\faDatabase \ Layer 2}\\
-            \tiny \texttt{aibom.sqlite} (912 MB)\\[1pt]
-            \tiny Cache sạch phân phối
+        \node[draw=myaccent, fill=myaccent!10, rounded corners=4pt, text width=2.8cm, minimum height=1.8cm, align=center, drop shadow] (l2) at (10.5, -1.0) {
+            \textbf{\faDatabase \ Layer 2: Cache}\\[2pt]
+            \texttt{\textbf{aibom.sqlite}}\\[1pt]
+            \tiny ($\approx$912 MB) $\bullet$ 17 keys\\[2pt]
+            \tiny Indexed Cache Phân Phối
         };
         
-        \draw[->, line width=1.2pt, mygreen] (api2) -- node[above, font=\tiny\bfseries, text=mygreen] {Cào 1 Lần} (l1);
-        \draw[->, line width=1.4pt, myaccent] (l1) -- node[above, font=\tiny\bfseries, text=myaccent] {Tái Cấu Trúc (Rust)} node[below, font=\tiny\bfseries, text=myprimary] {Vài phút (0 mạng!)} (l2);
-        \node[draw=mygreen, fill=mygreen!20, circle, inner sep=2pt] at (10.4, -0.8) {\textbf{\textcolor{mygreen}{\faCheck}}};
+        \draw[->, line width=1.3pt, mygreen] (api2.east) -- 
+            node[above=3pt, font=\tiny\bfseries, text=mygreen, align=center] {Ingestion 1 Lần} (l1.west);
+        \draw[->, line width=1.4pt, myaccent] (l1.east) -- 
+            node[above=3pt, font=\tiny\bfseries, text=myaccent, align=center] {Offline Replay (Rust)} 
+            node[below=3pt, font=\tiny\bfseries, text=myprimary, align=center] {Rebuild $<5$ phút (0 mạng)} (l2.west);
+        \node[draw=mygreen, fill=mygreen!20, circle, inner sep=2.5pt] at (12.5, -1.0) {\normalsize \textcolor{mygreen}{\faCheck}};
     \end{tikzpicture}
     }
     \end{center}
@@ -431,7 +436,7 @@
             \begin{successbox}[{\faCompress \hspace{2pt} Hiệu Quả Nén Dữ Liệu}]
                 \scriptsize
                 \begin{itemize}
-                    \item Loại bỏ văn bản bài báo rác $\to$ dung lượng còn \textbf{18.0 KB / model}.
+                    \item Loại bỏ văn bản phi cấu trúc dư thừa $\to$ dung lượng nén đạt \textbf{18.0 KB / model}.
                     \item Toàn bộ 50.000 models lưu gọn trong \textbf{~912 MB SQLite}.
                 \end{itemize}
             \end{successbox}
@@ -480,6 +485,70 @@ CREATE TABLE weight_set (
             \item \textbf{DB DDL (6 role thô)}: \texttt{weight}, \texttt{config}, \texttt{tokenizer}, \texttt{license}, \texttt{doc}, \texttt{other}.
             \item \textbf{Scanner Engine (5 FileRole)}: \texttt{Weight} (measured), \texttt{Auxiliary} (khóa trần heuristic cho config/tokenizer/license/doc), \texttt{Media}, \texttt{Archive}, \texttt{Other}.
         \end{itemize}
+    \end{infobox}
+\end{frame}
+
+\begin{frame}{Sơ Đồ Thực Thể - Quan Hệ CSDL Cache L2 (\texttt{aibom.sqlite})}
+    \begin{center}
+    \resizebox{0.96\textwidth}{!}{
+    \begin{tikzpicture}[auto, >=Latex, font=\scriptsize]
+        % Table 1: model (Central Table)
+        \node[draw=myprimary, fill=myprimary!8, rounded corners=3pt, text width=3.8cm, align=left, drop shadow] (model) at (0, 0) {
+            \textbf{\faTable \ Bảng \texttt{model}}\\[2pt]
+            \tiny \textbf{\textcolor{myalert}{\faKey \ repo\_id}} \texttt{TEXT PRIMARY KEY}\\
+            \tiny $\bullet$ \texttt{author}, \texttt{model\_name}, \texttt{sha}\\
+            \tiny $\bullet$ \texttt{pipeline\_tag}, \texttt{library\_name}\\
+            \tiny $\bullet$ \texttt{license\_spdx}, \texttt{license\_name}\\
+            \tiny $\bullet$ \texttt{config\_json}, \texttt{card\_data\_json}\\
+            \tiny $\bullet$ \dots (40 cột chuẩn hóa)\\
+            \vspace{1pt}
+            \centering \tiny \textit{49,992 models đại diện}
+        };
+
+        % Table 2: model_file (1-N from model)
+        \node[draw=myaccent, fill=myaccent!8, rounded corners=3pt, text width=3.8cm, align=left, drop shadow] (file) at (5.6, 1.55) {
+            \textbf{\faTable \ Bảng \texttt{model\_file}}\\[2pt]
+            \tiny \textbf{\textcolor{myalert}{\faKey \ (repo\_id, path)}} \texttt{PRIMARY KEY}\\
+            \tiny $\bullet$ \texttt{repo\_id} (\textbf{\textcolor{myprimary}{FK $\to$ model}})\\
+            \tiny $\bullet$ \textbf{\textcolor{mygreen}{\faSearch \ sha256}} \texttt{TEXT} \textbf{(B-Tree Index)}\\
+            \tiny $\bullet$ \texttt{lfs\_sha256}, \texttt{size\_bytes}\\
+            \tiny $\bullet$ \texttt{role} (\textit{weight, config, doc...})\\
+            \vspace{1pt}
+            \centering \tiny \textit{798,682 file hashes (Tra cứu $<1$ms)}
+        };
+
+        % Table 3: weight_set (1-N from model)
+        \node[draw=myorange, fill=myorange!8, rounded corners=3pt, text width=3.8cm, align=left, drop shadow] (ws) at (5.6, -1.55) {
+            \textbf{\faTable \ Bảng \texttt{weight\_set}}\\[2pt]
+            \tiny \textbf{\textcolor{myalert}{\faKey \ weight\_set\_sha256}} \texttt{PK (Index)}\\
+            \tiny $\bullet$ \texttt{repo\_id} (\textbf{\textcolor{myprimary}{FK $\to$ model}})\\
+            \tiny $\bullet$ \texttt{member\_count}, \texttt{total\_bytes}\\
+            \vspace{1pt}
+            \centering \tiny \textit{47,854 chữ ký cụm Shards}
+        };
+
+        % Table 4: harvest_gap (1-N from model)
+        \node[draw=mypurple, fill=mypurple!8, rounded corners=3pt, text width=3.2cm, align=left, drop shadow] (gap) at (10.6, 0) {
+            \textbf{\faTable \ Bảng \texttt{harvest\_gap}}\\[2pt]
+            \tiny \textbf{\textcolor{myalert}{\faKey \ (repo\_id, field, ...)}}\\
+            \tiny $\bullet$ \texttt{repo\_id} (\textbf{\textcolor{myprimary}{FK $\to$ model}})\\
+            \tiny $\bullet$ \texttt{field}, \texttt{provider}\\
+            \tiny $\bullet$ \texttt{pointer NOT NULL DEFAULT ''}\\
+            \vspace{1pt}
+            \centering \tiny \textit{Audit thiếu sót dữ liệu}
+        };
+
+        % Relationships
+        \draw[->, line width=1.2pt, myprimary] (model.east) -- ++(0.4,0) |- (file.west) node[near start, above, font=\tiny\bfseries] {1 : N};
+        \draw[->, line width=1.2pt, myprimary] (model.east) -- ++(0.4,0) |- (ws.west) node[near start, below, font=\tiny\bfseries] {1 : N};
+        \draw[->, line width=1.2pt, myaccent] (model.east) -- (gap.west) node[pos=0.88, above, font=\tiny\bfseries] {1 : N};
+    \end{tikzpicture}
+    }
+    \end{center}
+    \vspace{-0.2cm}
+    \begin{infobox}[{\faSearch \hspace{2pt} Tối Ưu Hóa Tốc Độ Tra Cứu (Zero-Scan Overhead)}]
+        \scriptsize
+        Chỉ mục B-Tree trên cột \texttt{sha256} và \texttt{weight\_set\_sha256} cho phép scanner tra cứu tức thì danh tính model và candidate repos trong \textbf{dưới 1ms}, hoàn toàn độc lập với kích thước cơ sở dữ liệu.
     \end{infobox}
 \end{frame}
 
@@ -588,7 +657,7 @@ VACUUM;
     \end{infobox}
 \end{frame}
 
-\begin{frame}{4 Mức Độ Tin Cậy Của Dữ Liệu (Evidence Levels)}
+\begin{frame}{Hệ Thống 4 Cấp Evidence Class (Evidence Levels)}
     $$\text{\textbf{heuristic (0)}} < \text{\textbf{declared (1)}} < \text{\textbf{verified (2)}} < \text{\textbf{measured (3)}}$$
     
     \begin{table}
@@ -597,30 +666,30 @@ VACUUM;
         \renewcommand{\arraystretch}{1.05}
         \begin{tabular}{c l p{0.36\textwidth} p{0.36\textwidth}}
             \toprule
-            \textbf{Cấp} & \textbf{Tên Cấp} & \textbf{Định Nghĩa} & \textbf{Cách Thu Thập Trong Engine} \\
+            \textbf{Cấp} & \textbf{Evidence Class} & \textbf{Định Nghĩa} & \textbf{Phương Pháp Thu Thập} \\
             \midrule
-            \textbf{0} & \texttt{Heuristic} & Phỏng đoán ngoại quan / regex tên file & Đuôi \texttt{.safetensors} $\to$ đoán framework \\
-            \textbf{1} & \texttt{Declared} & Tác giả tự khai trên web (chưa verify) & Model Card ghi \texttt{license: mit} \\
-            \textbf{2} & \texttt{Verified} & \textbf{2 nguồn độc lập xác thực lẫn nhau} & Header file khớp với Model Card \\
-            \textbf{3} & \texttt{Measured} & \textbf{Đo trực tiếp từ file binary} & Đọc tensor header ra đúng số params \\
+            \textbf{0} & \texttt{Heuristic} & Phỏng đoán ngoại quan / regex tên tệp & Đuôi \texttt{.safetensors} $\to$ phỏng đoán framework \\
+            \textbf{1} & \texttt{Declared} & Declared metadata trên web (chưa xác minh) & Model Card ghi \texttt{license: mit} \\
+            \textbf{2} & \texttt{Verified} & $\ge 2$ nguồn độc lập xác thực lẫn nhau & Header nhị phân khớp với Model Card \\
+            \textbf{3} & \texttt{Measured} & Đo đạc trực tiếp từ cấu trúc binary & Binary sniffer parse tensor header \\
             \bottomrule
         \end{tabular}
     \end{table}
     \vspace{-0.1cm}
     \begin{infobox}[{\faCogs \hspace{2pt} Tại Sao Dùng Thang Thứ Tự (Ordinal Scale)?}]
         \scriptsize
-        Thang thứ tự (\texttt{Ord} trong Rust) giúp so sánh bằng chứng hoàn toàn tất định, 0 dùng điểm số xác suất mơ hồ.
+        Thang thứ tự (\texttt{Ord} trong Rust) giúp so sánh evidence class hoàn toàn tất định, loại bỏ hoàn toàn các điểm số xác suất mơ hồ.
     \end{infobox}
 \end{frame}
 
-\begin{frame}{Ví Dụ Thực Tế: 4 Cấp Độ Khi Tìm Tham Số Model Meta-Llama-3-8B}
+\begin{frame}{Ví Dụ Thực Tế: 4 Cấp Evidence Class Khi Xác Định Param Count}
     \begin{columns}[onlytextwidth, T]
         \begin{column}{0.48\textwidth}
             \begin{infobox}[{\faSearch \hspace{2pt} Cấp 0: Heuristic \& Cấp 1: Declared}]
                 \scriptsize
                 \begin{itemize}
-                    \item \textbf{Cấp 0 (Heuristic)}: Nhìn tên file \texttt{llama-3-8b.gguf} $\to$ Phỏng đoán sơ bộ là model khoảng 8 tỷ tham số (~8B).
-                    \item \textbf{Cấp 1 (Declared)}: Đọc Model Card trên HF Web $\to$ Tác giả tự gõ tay vào README: \texttt{param\_count: 8B}.
+                    \item \textbf{Cấp 0 (Heuristic)}: Phân tích tên tệp \texttt{llama-3-8b.gguf} $\to$ Phỏng đoán sơ bộ model quy mô khoảng 8 tỷ tham số (~8B).
+                    \item \textbf{Cấp 1 (Declared)}: Đọc Model Card trên web $\to$ Tác giả khai báo trong README: \texttt{param\_count: 8B}.
                 \end{itemize}
             \end{infobox}
         \end{column}
@@ -629,76 +698,89 @@ VACUUM;
             \begin{successbox}[{\faCheckDouble \hspace{2pt} Cấp 2: Verified \& Cấp 3: Measured}]
                 \scriptsize
                 \begin{itemize}
-                    \item \textbf{Cấp 2 (Verified)}: Web ghi \texttt{8B}, file đo ra \texttt{8.03B} (khớp sai số cho phép) $\to$ Đạt cấp \textbf{Verified} (Đã kiểm chứng).
-                    \item \textbf{Cấp 3 (Measured)}: Parse tensor header $\to$ Đếm chính xác \textbf{8,030,261,248 params} (Đo lường vật lý tuyệt đối).
+                    \item \textbf{Cấp 2 (Verified)}: Web ghi \texttt{8B}, binary đo ra \texttt{8.03B} (khớp dung sai cho phép) $\to$ Thăng cấp \textbf{Verified}.
+                    \item \textbf{Cấp 3 (Measured)}: Binary sniffer parse tensor header $\to$ Đếm chính xác \textbf{8,030,261,248 params} (Đo đạc tất định).
                 \end{itemize}
             \end{successbox}
         \end{column}
     \end{columns}
 \end{frame}
 
-\begin{frame}{Ẩn Dụ Trực Quan: Kiểm Tra Cân Nặng Hành Lý Sân Bay}
-    \begin{columns}[onlytextwidth, T]
-        \begin{column}{0.31\textwidth}
-            \begin{infobox}[{\faSuitcase \hspace{2pt} 1. Tự Khai (Declared)}]
-                \scriptsize
-                \textbf{Hành động sân bay:}\\
-                Khách dán mác giấy lên vali ghi: \textit{"Vali nặng 7 kg"}.\\[4pt]
-                \textbf{Tương đương AI-BOM:}\\
-                Tác giả tự gõ vào Model Card: \texttt{param\_count: 7B}.\\[4pt]
-                \textbf{\textcolor{myalert}{Đặc tính:}} Lời tự khai một phía, có thể gõ nhầm (70B) hoặc làm tròn thương mại.
-            \end{infobox}
-        \end{column}
-        \hfill
-        \begin{column}{0.31\textwidth}
-            \begin{infobox}[{\faStamp \hspace{2pt} 2. Xác Thực (Verified)}]
-                \scriptsize
-                \textbf{Hành động sân bay:}\\
-                Nhân viên nhìn cân (6.74 kg) $\approx$ mác (7 kg) $\to$ Đóng dấu \textbf{ĐÃ XÁC NHẬN}.\\[4pt]
-                \textbf{Tương đương AI-BOM:}\\
-                Khai báo và đo đạc khớp nhau trong dung sai $\to$ \texttt{Verified}.\\[4pt]
-                \textbf{\textcolor{myaccent}{Đặc tính:}} Hai nguồn độc lập xác nhận lẫn nhau.
-            \end{infobox}
-        \end{column}
-        \hfill
-        \begin{column}{0.32\textwidth}
-            \begin{successbox}[{\faWeightHanging \hspace{2pt} 3. Đo Đạc Vật Lý}]
-                \scriptsize
-                \textbf{Hành động sân bay:}\\
-                Đặt vali lên cân điện tử, đồng hồ hiện: \textbf{6.74 kg}.\\[4pt]
-                \textbf{Tương đương AI-BOM (Measured):}\\
-                Engine mở file nhị phân, đếm từng tensor: \textbf{6.74B params}.\\[4pt]
-                \textbf{\textcolor{mygreen}{Đặc tính:}} Sự thật vật lý tất định 100\%, đo ở máy nào cũng ra đúng con số này.
-            \end{successbox}
-        \end{column}
-    \end{columns}
-    \vspace{0.05cm}
-    \begin{alertbox}[{\faGavel \hspace{2pt} Khi Có Mâu Thuẫn: Bàn Cân Điện Tử Luôn Là Chân Lý!}]
+\begin{frame}{Sơ Đồ Phân Cấp \& Hòa Giải Evidence Class}
+    \begin{center}
+    \resizebox{0.96\textwidth}{!}{
+    \begin{tikzpicture}[auto, >=Latex, font=\scriptsize]
+        % 4 Levels Box Hierarchy
+        \node[draw=gray, fill=gray!8, rounded corners=3pt, text width=2.4cm, minimum height=3.0cm, align=center] (lvl0) at (0, 0) {
+            \textbf{\faSearch \ Cấp 0: Heuristic}\\[4pt]
+            \tiny $\bullet$ Regex tên tệp\\
+            \tiny $\bullet$ Phỏng đoán format\\
+            \tiny $\bullet$ Không có bảo đảm\\
+            \vspace{8pt}
+            \textbf{\textcolor{gray}{\tiny Cấp thấp nhất}}
+        };
+        \node[draw=myprimary, fill=myprimary!8, rounded corners=3pt, text width=2.6cm, minimum height=3.0cm, align=center] (lvl1) at (3.1, 0) {
+            \textbf{\faGlobe \ Cấp 1: Declared}\\[4pt]
+            \tiny $\bullet$ Model Card metadata\\
+            \tiny $\bullet$ Repository tags\\
+            \tiny $\bullet$ Lời khai đơn phương\\
+            \vspace{8pt}
+            \textbf{\textcolor{myprimary}{\tiny Claims từ Web}}
+        };
+        \node[draw=myaccent, fill=myaccent!10, rounded corners=3pt, text width=2.8cm, minimum height=3.0cm, align=center] (lvl2) at (6.5, 0) {
+            \textbf{\faCheckDouble \ Cấp 2: Verified}\\[4pt]
+            \tiny $\bullet$ $\ge 2$ nguồn độc lập\\
+            \tiny $\bullet$ Khớp giá trị trong dung sai\\
+            \tiny $\bullet$ Cross-validation\\
+            \vspace{8pt}
+            \textbf{\textcolor{myaccent}{\tiny Xác thực chéo}}
+        };
+        \node[draw=mygreen, fill=mygreen!12, rounded corners=3pt, text width=3.0cm, minimum height=3.0cm, align=center, drop shadow] (lvl3) at (10.2, 0) {
+            \textbf{\faRulerCombined \ Cấp 3: Measured}\\[4pt]
+            \tiny $\bullet$ Đo trực tiếp từ binary\\
+            \tiny $\bullet$ Tensor shapes \& dtypes\\
+            \tiny $\bullet$ Tính toán tất định\\
+            \vspace{8pt}
+            \textbf{\textcolor{mygreen}{\tiny Tiêu chuẩn cao nhất}}
+        };
+
+        % Escalation Arrows
+        \draw[->, line width=1.3pt, gray] (lvl0.east) -- (lvl1.west);
+        \draw[->, line width=1.3pt, myprimary] (lvl1.east) -- (lvl2.west);
+        \draw[->, line width=1.3pt, myaccent] (lvl2.east) -- (lvl3.west);
+    \end{tikzpicture}
+    }
+    \end{center}
+    \vspace{-0.2cm}
+    \begin{infobox}[{\faBalanceScale \hspace{2pt} Nguyên Tắc Hòa Giải (Resolution Policy)}]
         \scriptsize
-        Nếu mác dán ghi \textbf{70 kg} nhưng cân điện tử chỉ hiện \textbf{6.74 kg} $\to$ Bỏ lời khai mác giấy, chốt theo số cân thực tế (\textbf{Measured thắng tuyệt đối}), đồng thời lập biên bản ghi nhận mâu thuẫn để đối soát.
-    \end{alertbox}
+        \begin{itemize}
+            \item \textbf{Xác thực chéo (Cross-Validation)}: Khi giá trị khai báo (\texttt{declared}) khớp với cấu trúc nhị phân đo đạc (\texttt{measured}), thăng cấp thuộc tính lên \texttt{verified}.
+            \item \textbf{Quyền ưu tiên cấu trúc (Structural Override)}: Khi có conflict giữa khai báo và đo đạc, giá trị \texttt{measured} luôn được chọn cho các thuộc tính vật lý, đồng thời lưu toàn bộ claims vào evidence để đối soát.
+        \end{itemize}
+    \end{infobox}
 \end{frame}
 
-\begin{frame}{Khi Dữ Liệu Khai Báo Mâu Thuẫn Với Đo Đạc Thực Tế}
+\begin{frame}{Xử Lý Conflict Giữa Declared Metadata \& Measured Data}
     \begin{table}
         \centering
         \footnotesize
         \renewcommand{\arraystretch}{1.1}
         \begin{tabular}{p{0.22\textwidth} p{0.36\textwidth} p{0.36\textwidth}}
             \toprule
-            \textbf{Cấp Bằng Chứng} & \textbf{Cách Thu Thập} & \textbf{Ví Dụ Trong Thực Tế} \\
+            \textbf{Evidence Class} & \textbf{Phương Pháp Thu Thập} & \textbf{Hành Vi Kỹ Thuật Trong Engine} \\
             \midrule
-            \textbf{1. Declared} & Tác giả tự khai trong Model Card & Card ghi: \texttt{param\_count: 7B} \\
+            \textbf{1. Declared} & Khai báo trong Model Card & Card ghi: \texttt{param\_count: 7B} \\
             \textbf{2. Verified} & 2 nguồn độc lập khớp nhau trong sai số & Khớp dung sai (6.74B $\approx$ 7B) $\to$ \textbf{Verified} \\
-            \textbf{3. Measured} & Đo cấu trúc tensor từ file binary & Parse header: \textbf{6,738,415,616 params} \\
+            \textbf{3. Measured} & Binary sniffer parse cấu trúc tensor & Trích xuất header: \textbf{6,738,415,616 params} \\
             \midrule
-            \textbf{Mâu thuẫn} & Card khai 70B nhưng file chỉ có 6.74B & \textbf{Measured thắng tuyệt đối}, lưu log audit \\
+            \textbf{Conflict} & Card khai 70B nhưng file chỉ có 6.74B & \textbf{Quyền ưu tiên cấu trúc (Measured)}, lưu audit log \\
             \bottomrule
         \end{tabular}
     \end{table}
 \end{frame}
 
-\begin{frame}{Ví Dụ: Xử Lý Mâu Thuẫn Giữa Lời Khai \& File Thực Tế}
+\begin{frame}{Ví Dụ: Xử Lý Conflict Giữa Declared Metadata \& Đo Đạc Thực Tế}
     \begin{columns}[onlytextwidth, T]
         \begin{column}{0.48\textwidth}
             \begin{alertbox}[{\faExclamationTriangle \hspace{2pt} 1. Sai Lệch Khai Báo (Model Card)}]
@@ -712,7 +794,7 @@ VACUUM;
         \end{column}
         \hfill
         \begin{column}{0.48\textwidth}
-            \begin{successbox}[{\faShield* \hspace{2pt} 2. Phán Quyết Của Scanner}]
+            \begin{successbox}[{\faShield* \hspace{2pt} 2. Logic Resolution Của Scanner}]
                 \scriptsize
                 \begin{itemize}
                     \item Parse header tensor $\to$ xác định \textbf{6.74B params}.
@@ -781,41 +863,41 @@ VACUUM;
             \tiny $\bullet$ \texttt{local\_binary} (File local)\\
             \tiny $\bullet$ \texttt{hf\_card} (README)\\
             \tiny $\bullet$ \texttt{hf\_api} (Tags web)\\
-            \tiny $\bullet$ \texttt{heuristic} (Tên/đuôi file)\\
+            \tiny $\bullet$ \texttt{heuristic} (Tên/đuôi tệp)\\
             \vspace{1pt}
-            \centering \tiny \textit{"Chui từ đâu ra?"}
+            \centering \tiny \textit{Provenance của dữ liệu}
         };
 
         % Column 2: EvidenceClass
         \node[draw=myaccent, fill=myaccent!10, rounded corners=4pt, text width=2.8cm, align=left, drop shadow] (evidence) at (3.8, 0) {
-            \textbf{\faBalanceScale \ 2. Cấp Tin Cậy}\\
+            \textbf{\faBalanceScale \ 2. Evidence Class}\\
             \textbf{\textcolor{myaccent}{\scriptsize (EvidenceClass)}}\\[3pt]
             \tiny \textbf{3. Measured} (Đo binary)\\
-            \tiny \textbf{2. Verified} (Chứng thực chéo)\\
-            \tiny \textbf{1. Declared} (Tự khai web)\\
+            \tiny \textbf{2. Verified} (Xác thực chéo)\\
+            \tiny \textbf{1. Declared} (Web metadata)\\
             \tiny \textbf{0. Heuristic} (Suy đoán)\\
             \vspace{1pt}
-            \centering \tiny \textit{"Tin tưởng bao nhiêu?"}
+            \centering \tiny \textit{Độ tin cậy toán học}
         };
 
         % Column 3: Combinator / Policy
         \node[draw=myorange, fill=myorange!10, rounded corners=4pt, text width=2.5cm, align=center, drop shadow] (gate) at (7.5, 0) {
             \textbf{\faGavel \ Policy Gate}\\[2pt]
-            \tiny So khớp mức tin cậy cao nhất\\
+            \tiny Lọc theo sàn tối thiểu\\
             \texttt{\tiny max(EvidenceClass)}\\[2pt]
-            \tiny Kiểm tra đồng thuận vs mâu thuẫn
+            \tiny Kiểm tra đồng thuận vs conflict
         };
 
         % Column 4: Resolution
         \node[draw=mygreen, fill=mygreen!10, rounded corners=4pt, text width=3.0cm, align=left, drop shadow] (resolution) at (11.3, 0) {
-            \textbf{\faCheckDouble \ 3. Phán Quyết}\\
+            \textbf{\faCheckDouble \ 3. Resolution}\\
             \textbf{\textcolor{mygreen}{\scriptsize (Resolution)}}\\[3pt]
-            \tiny $\bullet$ \texttt{Resolved}: Điền slot chính\\
+            \tiny $\bullet$ \texttt{Resolved}: Điền native slot\\
             \tiny $\bullet$ \texttt{Ambiguous}: Đồng thuận\\
-            \tiny $\bullet$ \texttt{Conflicting}: Để trống slot,\\
-            \tiny \ \ \ lưu vào \texttt{evidence.licenses[]}\\
+            \tiny $\bullet$ \texttt{Conflicting}: Withholding,\\
+            \tiny \ \ \ lưu claims vào evidence\\
             \vspace{1pt}
-            \centering \tiny \textit{"Kết luận cuối cùng?"}
+            \centering \tiny \textit{Kết luận tất định}
         };
 
         % Connecting arrows
@@ -828,7 +910,7 @@ VACUUM;
     \vspace{-0.15cm}
     \begin{infobox}[{\faLightbulb \hspace{2pt} Tính Độc Lập Trực Giao (Orthogonality)}]
         \scriptsize
-        \textbf{SourceRef} chỉ nguồn gốc vật lý; \textbf{EvidenceClass} chỉ độ vững chắc khoa học; \textbf{Resolution} là kết quả logic sau khi đối chiếu. Tuyệt đối không đánh đồng nguồn gốc với kết luận.
+        \textbf{SourceRef} biểu thị provenance vật lý; \textbf{EvidenceClass} xác định trọng số độ tin cậy; \textbf{Resolution} là kết quả logic tất định. Tuyệt đối không đồng nhất provenance với kết luận resolution.
     \end{infobox}
 \end{frame}
 
@@ -871,7 +953,7 @@ VACUUM;
         \toprule
         \textbf{Vai Trò File} & \textbf{Mức Tin Cậy Max} & \textbf{Tạo Candidate?} & \textbf{Nguyên Tắc Xử Lý} \\
         \midrule
-        \textbf{Weight} & \texttt{measured} & \textbf{Có} (Đầy đủ) & File chứa trọng số model $\to$ match hash xác định danh tính model. \\
+        \textbf{Weight} & \texttt{measured} & \textbf{Có} (Đầy đủ) & File chứa model weights $\to$ match hash xác định danh tính model. \\
         \textbf{Auxiliary} & \texttt{heuristic} & \textbf{Có} (Bị chặn) & File cấu hình dùng chung $\to$ khóa trần heuristic tránh gán nhầm. \\
         \textbf{Media} & \textbf{N/A} & \textbf{Không} & File ảnh, icon $\to$ 0 dùng để nhận diện model. \\
         \textbf{Archive} & \textbf{N/A} & \textbf{Không} & File nén \texttt{.zip}, \texttt{.tar} $\to$ 0 dùng để nhận diện model. \\
@@ -887,7 +969,7 @@ VACUUM;
             \begin{successbox}[{\faCube \hspace{2pt} 1. File Weight (\texttt{model.safetensors})}]
                 \scriptsize
                 \begin{itemize}
-                    \item Trọng số 16 GB chứa cấu trúc tensor.
+                    \item Model weights 16 GB chứa cấu trúc tensor.
                     \item Match SHA-256 $\to$ Xác định đúng model \texttt{Meta-Llama-3-8B} (Cấp Measured).
                 \end{itemize}
             \end{successbox}
@@ -919,14 +1001,87 @@ VACUUM;
     \end{columns}
 \end{frame}
 
-\begin{frame}{Cách Xử Lý Mâu Thuẫn Trong Cùng 1 Repo (\texttt{from\_claims})}
+\begin{frame}{Sơ Đồ Trực Quan: Cổng Lọc Phân Cấp FileRole (File Gate)}
+    \begin{center}
+    \resizebox{0.96\textwidth}{!}{
+    \begin{tikzpicture}[auto, >=Latex, font=\scriptsize]
+        % Input Files
+        \node[draw=myprimary, fill=myprimary!10, rounded corners=3pt, text width=2.8cm, align=left] (f1) at (0, 1.95) {
+            \textbf{\faCube \ \texttt{model.safetensors}}\\
+            \tiny File model weights 16 GB
+        };
+        \node[draw=myaccent, fill=myaccent!10, rounded corners=3pt, text width=2.8cm, align=left] (f2) at (0, 0.65) {
+            \textbf{\faFileCode \ \texttt{tokenizer.json}}\\
+            \tiny File phụ trợ (1,037 repos)
+        };
+        \node[draw=myorange, fill=myorange!10, rounded corners=3pt, text width=2.8cm, align=left] (f3) at (0, -0.65) {
+            \textbf{\faImage \ \texttt{logo.png}}\\
+            \tiny File ảnh / media (300 B)
+        };
+        \node[draw=myalert, fill=myalert!10, rounded corners=3pt, text width=2.8cm, align=left] (f4) at (0, -1.95) {
+            \textbf{\faArchive \ \texttt{bundle.zip}}\\
+            \tiny File nén archive
+        };
+
+        % Gate
+        \node[draw=myprimary, fill=myprimary!15, rounded corners=4pt, text width=2.4cm, minimum height=4.5cm, align=center, drop shadow] (gate) at (4.6, 0) {
+            \textbf{\faFilter \ FileRole}\\
+            \textbf{\textcolor{myprimary}{Gate}}\\[6pt]
+            \tiny Phân loại dựa trên\\
+            \tiny phần mở rộng\\
+            \tiny \& magic bytes\\
+            \tiny nhị phân
+        };
+
+        % Outputs
+        \node[draw=mygreen, fill=mygreen!10, rounded corners=3pt, text width=4.6cm, align=left, drop shadow] (out1) at (9.6, 1.95) {
+            \textbf{\faCheckCircle \ \textcolor{mygreen}{Weight Role: Tạo Candidate}}\\
+            \tiny $\bullet$ Cấp tin cậy: \textbf{Measured} (Đo trực tiếp)\\
+            \tiny $\bullet$ Khớp SHA-256 định danh chính xác model
+        };
+        \node[draw=myaccent, fill=myaccent!10, rounded corners=3pt, text width=4.6cm, align=left, drop shadow] (out2) at (9.6, 0.65) {
+            \textbf{\faLock \ \textcolor{myaccent}{Auxiliary Role: Khóa Trần}}\\
+            \tiny $\bullet$ Cấp tin cậy tối đa: \textbf{Heuristic}\\
+            \tiny $\bullet$ Bị chặn: 0 cho phép tự ý gán purl model
+        };
+        \node[draw=myalert, fill=myalert!10, rounded corners=3pt, text width=4.6cm, align=left, drop shadow] (out3) at (9.6, -0.65) {
+            \textbf{\faBan \ \textcolor{myalert}{Media Role: Chặn Candidate}}\\
+            \tiny $\bullet$ 0 tham gia định danh model\\
+            \tiny $\bullet$ Xuất component độc lập \texttt{type: "file"}
+        };
+        \node[draw=myalert, fill=myalert!10, rounded corners=3pt, text width=4.6cm, align=left, drop shadow] (out4) at (9.6, -1.95) {
+            \textbf{\faBan \ \textcolor{myalert}{Archive Role: Chặn Candidate}}\\
+            \tiny $\bullet$ 0 dùng mã băm archive nhận diện weights
+        };
+
+        % Arrows
+        \draw[->, line width=1.1pt, myprimary] (f1.east) -- (gate.west |- f1.east);
+        \draw[->, line width=1.1pt, myaccent] (f2.east) -- (gate.west |- f2.east);
+        \draw[->, line width=1.1pt, myorange] (f3.east) -- (gate.west |- f3.east);
+        \draw[->, line width=1.1pt, myalert] (f4.east) -- (gate.west |- f4.east);
+
+        \draw[->, line width=1.1pt, mygreen] (gate.east |- out1.west) -- (out1.west);
+        \draw[->, line width=1.1pt, myaccent] (gate.east |- out2.west) -- (out2.west);
+        \draw[->, line width=1.1pt, myalert] (gate.east |- out3.west) -- (out3.west);
+        \draw[->, line width=1.1pt, myalert] (gate.east |- out4.west) -- (out4.west);
+    \end{tikzpicture}
+    }
+    \end{center}
+    \vspace{-0.2cm}
+    \begin{infobox}[{\faLightbulb \hspace{2pt} Nguyên Tắc Cô Lập Định Danh}]
+        \scriptsize
+        Chỉ có file mang vai trò \textbf{Weight} mới có quyền định danh mô hình học máy. Các file phụ trợ, hình ảnh và tệp nén bị cô lập hoàn toàn để triệt tiêu nguy cơ gán nhầm metadata trên diện rộng.
+    \end{infobox}
+\end{frame}
+
+\begin{frame}{Quy Trình Resolution Nội Bộ Repo (\texttt{from\_claims})}
     \begin{figure}
         \centering
         \resizebox{0.95\textwidth}{!}{
         \begin{tikzpicture}[node distance=0.8cm, auto, >=Latex, font=\scriptsize]
             \node[draw=myprimary, fill=myprimary!5, rounded corners, text width=3.0cm, align=center] (in) {\textbf{Tập Claims Thu Thập}\\Từ các nguồn cho 1 trường};
             \node[draw=myorange, fill=myorange!10, rounded corners, text width=3.2cm, align=center, right=0.6cm of in] (gate) {\textbf{Policy Gate}\\Loại bỏ claims $<$ Floor};
-            \node[draw=myaccent, fill=myaccent!10, rounded corners, text width=3.2cm, align=center, right=0.6cm of gate] (eval) {\textbf{Phân Cấp \& Hòa Giải}\\$\bullet$ Ưu tiên Measured\\$\bullet$ Declared+Measured $\to$ Verified\\$\bullet$ Khác giá trị cùng cấp $\to$ Conflict};
+            \node[draw=myaccent, fill=myaccent!10, rounded corners, text width=3.2cm, align=center, right=0.6cm of gate] (eval) {\textbf{Phân Cấp \& Resolution}\\$\bullet$ Ưu tiên Measured\\$\bullet$ Declared+Measured $\to$ Verified\\$\bullet$ Khác giá trị cùng cấp $\to$ Conflict};
             \node[draw=mygreen, fill=mygreen!10, rounded corners, text width=2.4cm, align=center, right=0.6cm of eval] (out) {\textbf{Kết Quả}\\Resolved/Conflict};
             \draw[->, line width=1pt] (in) -- (gate);
             \draw[->, line width=1pt] (gate) -- (eval);
@@ -935,9 +1090,9 @@ VACUUM;
         }
     \end{figure}
     \vspace{-0.2cm}
-    \begin{successbox}[{\faShield* \hspace{2pt} Lọc Bằng Chứng Rác Bằng Policy Gate}]
+    \begin{successbox}[{\faShield* \hspace{2pt} Loại Bỏ Claims Dưới Sàn Bằng Policy Gate}]
         \scriptsize
-        Đặt sàn = \textit{declared} $\to$ loại bỏ phỏng đoán \textit{heuristic} trước khi so sánh $\to$ chống báo động mâu thuẫn giả.
+        Đặt sàn = \textit{declared} $\to$ loại bỏ phỏng đoán \textit{heuristic} trước khi so sánh $\to$ ngăn chặn conflict giả tạo từ heuristic.
     \end{successbox}
 \end{frame}
 
@@ -948,13 +1103,13 @@ VACUUM;
         \renewcommand{\arraystretch}{1.05}
         \begin{tabular}{l p{0.36\textwidth} c p{0.32\textwidth}}
             \toprule
-            \textbf{Tình Huống} & \textbf{Tập Claims Đầu Vào} & \textbf{Floor} & \textbf{Kết Quả Phán Quyết} \\
+            \textbf{Tình Huống} & \textbf{Tập Claims Đầu Vào} & \textbf{Floor} & \textbf{Kết Quả Resolution} \\
             \midrule
             \textbf{A. Đồng thuận} & MIT (Card) + MIT (API) & \texttt{heuristic} & \texttt{Resolved \{ MIT, declared \}} \\
             \textbf{B. Xác thực chéo} & 4096 (Card) + 4096 (Header đo) & \texttt{heuristic} & \textbf{\texttt{Resolved \{ 4096, verified \}}} \\
-            \textbf{C. Đo lường thắng} & FP32 (Card) + BF16 (Header đo) & \texttt{heuristic} & \textbf{\texttt{Resolved \{ BF16, measured \}}} \\
-            \textbf{D. Xung đột nội bộ} & MIT (Card) + Apache-2.0 (API) & \texttt{heuristic} & \textbf{\texttt{Conflicting}} (Để trống) \\
-            \textbf{E. Gate lọc rác} & MIT (Card) + GPL (Tên phỏng đoán) & \texttt{declared} & \texttt{Resolved \{ MIT, declared \}} \\
+            \textbf{C. Quyền ưu tiên cấu trúc} & FP32 (Card) + BF16 (Header đo) & \texttt{heuristic} & \textbf{\texttt{Resolved \{ BF16, measured \}}} \\
+            \textbf{D. Conflict nội bộ} & MIT (Card) + Apache-2.0 (API) & \texttt{heuristic} & \textbf{\texttt{Conflicting}} (Withholding) \\
+            \textbf{E. Policy Gate lọc Heuristic} & MIT (Card) + GPL (Tên phỏng đoán) & \texttt{declared} & \texttt{Resolved \{ MIT, declared \}} \\
             \textbf{F. Không có dữ liệu} & Trống 0 có claim nào & \texttt{declared} & \texttt{Unknown} \\
             \bottomrule
         \end{tabular}
@@ -967,9 +1122,9 @@ VACUUM;
             \begin{infobox}[{\faUsers \hspace{2pt} 1. Đánh Giá Tranh Chấp Trên Toàn Bộ Repo}]
                 \scriptsize
                 \begin{itemize}
-                    \item Duyệt và kiểm tra mâu thuẫn trên toàn bộ $N$ repos trước khi cắt giảm danh sách.
-                    \item 100\% repo cùng license $\to$ \texttt{Ambiguous(agreed)} (điền license).
-                    \item Có repo lệch license $\to$ \texttt{Conflicting} (để trống license chính).
+                    \item Duyệt và kiểm tra conflict trên toàn bộ $N$ repos trước khi cắt giảm danh sách.
+                    \item 100\% repo cùng license $\to$ \texttt{Ambiguous(agreed)} (điền native slot).
+                    \item Có repo lệch license $\to$ \texttt{Conflicting} (withholding native slot).
                 \end{itemize}
             \end{infobox}
         \end{column}
@@ -1014,6 +1169,54 @@ VACUUM;
     \end{columns}
 \end{frame}
 
+\begin{frame}{Sơ Đồ Trực Quan: Cơ Chế Phân Bổ Đại Diện Round-Robin}
+    \begin{center}
+    \resizebox{0.96\textwidth}{!}{
+    \begin{tikzpicture}[auto, >=Latex, font=\scriptsize]
+        % Left: 1,037 Repos grouped by license
+        \node[draw=myprimary, fill=myprimary!8, rounded corners=3pt, text width=3.4cm, align=left] (buckets) at (0, 0) {
+            \textbf{\faFolderOpen \ 1,037 Repos Khớp Hash}\\[2pt]
+            \tiny $\bullet$ Nhóm \textbf{MIT}: 850 repos\\
+            \tiny $\bullet$ Nhóm \textbf{Apache-2.0}: 120 repos\\
+            \tiny $\bullet$ Nhóm \textbf{GPL-3.0}: 25 repos\\
+            \tiny $\bullet$ Nhóm \textbf{BSD-3}: 18 repos\\
+            \tiny $\bullet$ Nhóm \textbf{CC-BY}: 12 repos\\
+            \tiny $\bullet$ Nhóm \textbf{Khác} (7 nhóm): 12 repos\\[2pt]
+            \centering \tiny \textit{(Tổng cộng 12 nhóm bản quyền)}
+        };
+
+        % Middle: Round-Robin Algorithm
+        \node[draw=myorange, fill=myorange!10, rounded corners=4pt, text width=3.2cm, align=center, drop shadow] (algo) at (5.0, 0) {
+            \textbf{\faSync \ Vòng Lặp Round-Robin}\\[4pt]
+            \tiny $\bullet$ \textbf{Lượt 1}: 1 MIT, 1 Apache, 1 GPL, 1 BSD...\\
+            \tiny $\bullet$ \textbf{Lượt 2}: 1 MIT, 1 Apache, 1 GPL, 1 BSD...\\
+            \tiny $\bullet$ \dots\\
+            \tiny $\bullet$ Dừng khi đủ $K = 50$ repos đại diện\\[2pt]
+            \textbf{\textcolor{myorange}{\tiny Không để nhóm nào độc chiếm!}}
+        };
+
+        % Right: 50 Representative Candidates
+        \node[draw=mygreen, fill=mygreen!8, rounded corners=4pt, text width=3.6cm, align=left, drop shadow] (out) at (10.0, 0) {
+            \textbf{\faCheckDouble \ 50 Repos Xuất Vào BOM}\\[2pt]
+            \tiny $\bullet$ Đại diện MIT, Apache-2.0\\
+            \tiny $\bullet$ Đại diện GPL, BSD, CC-BY\\
+            \tiny $\bullet$ Đại diện 7 loại license hiếm còn lại\\[3pt]
+            \textbf{\textcolor{mygreen}{\tiny \faAward \ Đạt 100\% độ bao phủ (12/12 license)}}\\
+            \tiny Kiểm toán viên nhận diện trọn vẹn rủi ro!
+        };
+
+        \draw[->, line width=1.3pt, myprimary] (buckets.east) -- node[above, font=\tiny\bfseries] {Phân Giỏ} (algo.west);
+        \draw[->, line width=1.3pt, myorange] (algo.east) -- node[above, font=\tiny\bfseries] {Trích Xuất} (out.west);
+    \end{tikzpicture}
+    }
+    \end{center}
+    \vspace{-0.2cm}
+    \begin{infobox}[{\faLightbulb \hspace{2pt} Nguyên Tắc Đại Diện Đa Dạng Hóa}]
+        \scriptsize
+        Khi một tệp xuất hiện ở hàng nghìn kho lưu trữ, thuật toán Round-Robin ngăn chặn hiện tượng các kho lưu trữ phổ biến áp đảo danh sách, bảo đảm mọi loại giấy phép đều có đại diện để kiểm toán viên xem xét.
+    \end{infobox}
+\end{frame}
+
 % ============================================================
 % PHẦN 4: 12 TÌNH HUỐNG THỰC TẾ KHI QUÉT MODEL & FILE JSON MẪU
 % ============================================================
@@ -1028,18 +1231,18 @@ VACUUM;
         \toprule
         \textbf{Ca} & \textbf{Tình Huống Thực Tế} & \textbf{Cấu Trúc File} & \textbf{Trạng Thái} & \textbf{Hành Vi JSON Đầu Ra} \\
         \midrule
-        \textbf{1} & Khớp Đơn Nhất 1--1 & 1 File $\leftrightarrow$ 1 Repo & \texttt{Resolved} & Điền đủ Native slots, \texttt{confidence: 1.0} \\
-        \textbf{2} & Nhiều Repo Đồng Thuận & 1 File $\to$ 3 Repos (cùng license) & \texttt{Ambiguous(agreed)} & Điền Native slot \texttt{licenses}, candidateCount: 3 \\
-        \textbf{3} & Nhiều Repo Lệch License & 1 File 43 GiB $\to$ 3 Repos (khác license) & \texttt{Conflicting} & Để trống slot chính thức, ghi nhận evidence \\
-        \textbf{4} & File Phụ Trùng Hàng Nghìn Repo & \texttt{tokenizer.json} $\to$ 1,037 Repos & \texttt{Conflicting} & Round-Robin (50 đại diện cover 12 licenses) \\
-        \textbf{5} & File Media Không Phải Model & \texttt{logo.png} $\to$ 352 Repos & \texttt{FileRole::Media} & 0 tạo candidate model, 0 xuất purl \\
-        \textbf{6} & Thư Mục Model Chia Nhiều Shards & 3 Shards + \texttt{config.json} & \texttt{Resolved(verified)} & Gom nhóm weights, thăng cấp Verified khi khớp config \\
-        \textbf{7} & Thư Mục Chứa Nhiều Bản Quant & 7 GGUFs + 1 \texttt{config.json} & \texttt{Multi-Group} & Root chuyển thành \texttt{type: "file"}, ẩn shape vào withheld \\
-        \textbf{8} & File Chưa Từng Được Crawl & Hash Miss (File nội bộ) & \texttt{Unknown} & Sniff binary header $\to$ xuất parameters ở cấp \texttt{measured} \\
-        \textbf{9} & Mâu Thuẫn Trong Cùng 1 Repo & \texttt{hf\_api} (Apache) vs \texttt{hf\_card} (MIT) & \texttt{Conflicting} & Để trống slot chính thức, phơi bày cả 2 trong evidence \\
-        \textbf{10} & Khai Báo Khác Đo Đạc Thực Tế & Card khai 70B vs Header đo 6.74B & \texttt{Resolved(measured)} & Measured thắng tuyệt đối, log audit trail \\
-        \textbf{11} & File Weights 0-Byte Rác & File \texttt{.bin} 0 byte & \texttt{EMPTY\_SHA256} & Loại bỏ mã băm rỗng, cảnh báo không có file hợp lệ \\
-        \textbf{12} & File ONNX Kèm File Tách Rời & \texttt{model.onnx} + \texttt{\_data\_N} & \texttt{Resolved(sharded)} & Gom nhóm các file phân tách vào cùng 1 model group \\
+        \textbf{1} & Khớp Đơn Nhất 1--1 & 1 File $\leftrightarrow$ 1 Repo & \texttt{Resolved} & Điền đủ native slots, \texttt{confidence: 1.0} \\
+        \textbf{2} & Nhiều Repo Đồng Thuận & 1 File $\to$ 3 Repos (cùng license) & \texttt{Ambiguous(agreed)} & Điền native slot \texttt{licenses}, candidateCount: 3 \\
+        \textbf{3} & Conflict Giấy Phép Đa Repo & 1 File 43 GiB $\to$ 3 Repos (khác license) & \texttt{Conflicting} & Withholding native slot, ghi nhận claims \\
+        \textbf{4} & Auxiliary File Trùng Lặp & \texttt{tokenizer.json} $\to$ 1,037 Repos & \texttt{Conflicting} & Round-Robin (50 candidate cover 12 licenses) \\
+        \textbf{5} & File Media Không Phải Model & \texttt{logo.png} $\to$ 352 Repos & \texttt{FileRole::Media} & Chặn tạo candidate model, 0 xuất purl \\
+        \textbf{6} & Thư Mục Chứa Sharded Weights & 3 Shards + \texttt{config.json} & \texttt{Resolved(verified)} & Gom sharded weights, thăng cấp Verified \\
+        \textbf{7} & Thư Mục Multi-Group (Quant) & 7 GGUFs + 1 \texttt{config.json} & \texttt{Multi-Group} & Root sang \texttt{type: "file"}, withholding shapes \\
+        \textbf{8} & File Chưa Từng Được Crawl & Hash Miss (File nội bộ) & \texttt{Unknown} & Binary sniffer đo parameters cấp \texttt{measured} \\
+        \textbf{9} & Conflict Nội Bộ Repo & \texttt{hf\_api} (Apache) vs \texttt{hf\_card} (MIT) & \texttt{Conflicting} & Withholding native slot, lưu claims vào evidence \\
+        \textbf{10} & Conflict Declared vs Measured & Card khai 70B vs Header đo 6.74B & \texttt{Resolved(measured)} & Quyền ưu tiên cấu trúc (Measured), log audit \\
+        \textbf{11} & File Weights 0-Byte Không Hợp Lệ & File \texttt{.bin} 0 byte & \texttt{EMPTY\_SHA256} & Bỏ qua mã băm rỗng, cảnh báo tệp không hợp lệ \\
+        \textbf{12} & Model ONNX Tách Rời Trọng Số & \texttt{model.onnx} + \texttt{\_data\_N} & \texttt{Resolved(sharded)} & Gom nhóm các file phân tách vào 1 model group \\
         \bottomrule
     \end{tabular}
     }
@@ -1053,7 +1256,7 @@ VACUUM;
                 \scriptsize
                 \begin{itemize}
                     \item File \texttt{model.safetensors} khớp đúng 1 repo.
-                    \item Đủ bằng chứng $\to$ điền full native slots.
+                    \item Đầy đủ bằng chứng xác thực $\to$ điền toàn bộ native slots.
                     \item Khớp SHA-256 tuyệt đối với cơ sở dữ liệu $\to$ gán độ tin cậy \texttt{confidence: 1.0}.
                 \end{itemize}
             \end{infobox}
@@ -1089,7 +1292,7 @@ VACUUM;
             \begin{infobox}[{\faHandshake \hspace{2pt} Đặc Tính \& Cách Xử Lý}]
                 \scriptsize
                 \begin{itemize}
-                    \item File weights nằm ở 3 mirror repos.
+                    \item Model weights xuất hiện ở 3 mirror repos.
                     \item Cùng khai \texttt{license: llama3} và tác giả \texttt{meta-llama}.
                     \item \texttt{Ambiguous(agreed)} $\to$ vẫn điền native slot \texttt{licenses}.
                 \end{itemize}
@@ -1120,15 +1323,15 @@ VACUUM;
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Ca 3: Trùng File Weights Nhưng Lệch License}
+\begin{frame}[fragile]{Ca 3: Conflict Giấy Phép Đa Repo (1--N Candidates)}
     \begin{columns}[onlytextwidth, T]
         \begin{column}{0.40\textwidth}
             \begin{warnbox}[{\faExclamationTriangle \hspace{2pt} Đặc Tính \& Cách Xử Lý}]
                 \scriptsize
                 \begin{itemize}
                     \item File 43 GiB nằm ở 3 repos (Repo A: \textit{other}, Repo B: \textit{MIT}, Repo C: \textit{trống}).
-                    \item Slot \texttt{licenses: []} để trống $\to$ 0 phán bừa.
-                    \item Đẩy 3 claims vào \texttt{evidence.licenses[]}.
+                    \item Withholding native slot (\texttt{licenses: []}), không suy đoán chủ quan.
+                    \item Lưu đầy đủ các claims độc lập vào \texttt{evidence.licenses[]}.
                 \end{itemize}
             \end{warnbox}
         \end{column}
@@ -1226,14 +1429,14 @@ VACUUM;
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Ca 6: Thư Mục Model Chia Nhiều Shards}
+\begin{frame}[fragile]{Ca 6: Thư Mục Chứa Sharded Weights}
     \begin{columns}[onlytextwidth, T]
         \begin{column}{0.40\textwidth}
             \begin{infobox}[{\faFolderOpen \hspace{2pt} Đặc Tính \& Cách Xử Lý}]
                 \scriptsize
                 \begin{itemize}
-                    \item Thư mục chứa 3 shards \texttt{.safetensors} + \texttt{config.json}.
-                    \item Gom 3 shards $\to$ tính \texttt{weight\_set\_sha256}.
+                    \item Thư mục chứa 3 sharded weights \texttt{.safetensors} + \texttt{config.json}.
+                    \item Gom sharded weights $\to$ tính \texttt{weight\_set\_sha256}.
                     \item Đối chiếu với \texttt{config.json} $\to$ thăng cấp lên \textbf{Verified}.
                 \end{itemize}
             \end{infobox}
@@ -1263,13 +1466,13 @@ VACUUM;
     \end{columns}
 \end{frame}
 
-\begin{frame}{Ví Dụ Trực Quan: Cách Gom Nhóm \& Tính Chữ Ký Shards}
+\begin{frame}{Ví Dụ Trực Quan: Cách Gom Nhóm \& Tính Chữ Ký Sharded Weights}
     \begin{center}
     \resizebox{0.96\textwidth}{!}{
     \begin{tikzpicture}[auto, >=Latex, font=\scriptsize]
         % Files on disk
         \node[draw=myprimary, fill=myprimary!8, rounded corners=3pt, text width=3.4cm, align=left] (disk) at (0, 0) {
-            \textbf{\faFolderOpen \ Tệp Shards Ổ Đĩa}\\[2pt]
+            \textbf{\faFolderOpen \ Tập Sharded Weights Cục Bộ}\\[2pt]
             \tiny $\bullet$ \texttt{shard-00003.safetensors} (\texttt{SHA3})\\
             \tiny $\bullet$ \texttt{shard-00001.safetensors} (\texttt{SHA1})\\
             \tiny $\bullet$ \texttt{shard-00002.safetensors} (\texttt{SHA2})\\[2pt]
@@ -1311,15 +1514,15 @@ VACUUM;
     \end{infobox}
 \end{frame}
 
-\begin{frame}[fragile]{Ca 7: Thư Mục Chứa Nhiều Bản Lượng Tử Hóa (GGUF Đa Nhóm)}
+\begin{frame}[fragile]{Ca 7: Thư Mục Chứa Nhiều Bản Quantization (GGUF Multi-Group)}
     \begin{columns}[onlytextwidth, T]
         \begin{column}{0.40\textwidth}
             \begin{warnbox}[{\faLayerGroup \hspace{2pt} Đặc Tính \& Cách Xử Lý}]
                 \scriptsize
                 \begin{itemize}
-                    \item Thư mục chứa 7 file GGUF multi-quant + 1 \texttt{config.json}.
-                    \item Thư mục đa model $\to$ Root chuyển thành \texttt{type: "file"}.
-                    \item Ẩn các trường hình thái model vào danh sách \texttt{withheld}.
+                    \item Thư mục chứa 7 file GGUF quantization + 1 \texttt{config.json}.
+                    \item Thư mục Multi-Group $\to$ Root chuyển thành \texttt{type: "file"}.
+                    \item Withholding các trường hình thái model vào \texttt{withheld}.
                 \end{itemize}
             \end{warnbox}
         \end{column}
@@ -1343,7 +1546,7 @@ VACUUM;
     \end{columns}
 \end{frame}
 
-\begin{frame}{Ví Dụ Trực Quan: Xử Lý Thư Mục 7 Bản Lượng Tử Hóa GGUF}
+\begin{frame}{Ví Dụ Trực Quan: Xử Lý Thư Mục 7 Bản Quantization GGUF (Multi-Group)}
     \begin{center}
     \resizebox{0.84\textwidth}{!}{
     \begin{tikzpicture}[auto, >=Latex, font=\scriptsize]
@@ -1370,7 +1573,7 @@ VACUUM;
         \node[draw=mygreen, fill=mygreen!8, rounded corners=3pt, text width=3.8cm, align=left] (solution) at (5.6, -1.2) {
             \textbf{\faShield* \ \textcolor{mygreen}{Giải Pháp Cách Ly AI-BOM}}\\[1pt]
             \tiny $\bullet$ Root chuyển thành \texttt{type: "file"}\\
-            \tiny $\bullet$ Ẩn shape chung vào \texttt{withheld}\\
+            \tiny $\bullet$ Withholding shape chung vào \texttt{withheld}\\
             \tiny $\bullet$ Tách 7 bản GGUF thành \textbf{7 components con}\\
             \tiny \ \ \ với thông số đo đạc độc lập!
         };
@@ -1395,7 +1598,7 @@ VACUUM;
                 \begin{itemize}
                     \item File binary nội bộ chưa có trên Hugging Face.
                     \item Danh tính $\to$ \texttt{resolution: unknown}.
-                    \item Sniff header file để đo trực tiếp thông số ở cấp \textbf{Measured}.
+                    \item Binary sniffer parse header file để đo trực tiếp thông số ở cấp \textbf{Measured}.
                 \end{itemize}
             \end{infobox}
         \end{column}
@@ -1422,15 +1625,15 @@ VACUUM;
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Ca 9: Mâu Thuẫn Trong Cùng 1 Repo}
+\begin{frame}[fragile]{Ca 9: Conflict Nội Bộ Repo (API Tags vs README)}
     \begin{columns}[onlytextwidth, T]
         \begin{column}{0.40\textwidth}
             \begin{warnbox}[{\faBolt \hspace{2pt} Đặc Tính \& Cách Xử Lý}]
                 \scriptsize
                 \begin{itemize}
                     \item Cùng 1 repo: API khai Apache-2.0 nhưng Card khai MIT.
-                    \item Tách riêng từng nguồn dữ liệu $\to$ phát hiện mâu thuẫn.
-                    \item Để trống slot chính, lưu cả 2 nguồn vào evidence.
+                    \item Tách riêng từng nguồn dữ liệu $\to$ phát hiện conflict.
+                    \item Withholding native slot, lưu cả 2 nguồn claims vào evidence.
                 \end{itemize}
             \end{warnbox}
         \end{column}
@@ -1454,15 +1657,15 @@ VACUUM;
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Ca 10: Khai Báo Sai Lệch So Với Thực Tế Đo Đạc}
+\begin{frame}[fragile]{Ca 10: Conflict Giữa Declared Metadata \& Đo Đạc Cấu Trúc}
     \begin{columns}[onlytextwidth, T]
         \begin{column}{0.40\textwidth}
             \begin{successbox}[{\faBalanceScaleRight \hspace{2pt} Đặc Tính \& Cách Xử Lý}]
                 \scriptsize
                 \begin{itemize}
                     \item Model Card khai nhầm: \texttt{param\_count: 70B}.
-                    \item Sniff header tensor đếm ra: \textbf{6.74B params}.
-                    \item \textbf{Measured > Declared}: Chốt 6.74B, ghi log audit.
+                    \item Binary sniffer parse tensor header đếm ra: \textbf{6.74B params}.
+                    \item \textbf{Structural Override (Measured > Declared)}: Chốt 6.74B, ghi log audit.
                 \end{itemize}
             \end{successbox}
         \end{column}
@@ -1487,7 +1690,7 @@ VACUUM;
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Ca 11: File Weights 0-Byte (Loại Bỏ Mã Băm Rỗng)}
+\begin{frame}[fragile]{Ca 11: Xử Lý File Weights 0-Byte Không Hợp Lệ}
     \begin{columns}[onlytextwidth, T]
         \begin{column}{0.40\textwidth}
             \begin{alertbox}[{\faExclamationCircle \hspace{2pt} Đặc Tính \& Cách Xử Lý}]
@@ -1495,7 +1698,7 @@ VACUUM;
                 \begin{itemize}
                     \item Thư mục chứa file weights 0 byte.
                     \item Loại bỏ hash rỗng khỏi nhận diện model.
-                    \item Báo warning "no valid weight files", 0 match bừa.
+                    \item Cảnh báo "No valid weight files found", không gán candidate.
                 \end{itemize}
             \end{alertbox}
         \end{column}
@@ -1561,13 +1764,13 @@ VACUUM;
             \toprule
             \textbf{\#} & \textbf{Tên Quy Tắc} & \textbf{Hành Vi Xuất Dữ Liệu Thực Tế} \\
             \midrule
-            \textbf{1} & \textbf{Native Slot Gating} & Mâu thuẫn $\to$ để trống slot chính, đẩy claims vào evidence. \\
-            \textbf{2} & \textbf{Structural Override} & Kết quả đo \texttt{measured} thắng tuyệt đối lời khai \texttt{declared}. \\
-            \textbf{3} & \textbf{FileRole Ceiling} & File phụ khóa trần ở \texttt{heuristic}; Media 0 tạo candidate. \\
-            \textbf{4} & \textbf{Round-Robin Coverage} & Giới hạn 50 repo mẫu nhưng giữ đủ đại diện 12 loại license. \\
-            \textbf{5} & \textbf{Full Candidate Check} & Kiểm tra mâu thuẫn trên toàn bộ candidate trước khi cắt giảm. \\
-            \textbf{6} & \textbf{Policy Gate} & Lọc claims $<$ floor trước khi hòa giải để chống mâu thuẫn giả. \\
-            \textbf{7} & \textbf{Multi-Group Withholding} & Thư mục đa nhóm: Root là \texttt{file}, đưa thông số model vào \texttt{withheld}. \\
+            \textbf{1} & \textbf{Native Slot Gating} & Conflict $\to$ withholding native slot, lưu claims vào evidence. \\
+            \textbf{2} & \textbf{Structural Override} & Đo đạc \texttt{measured} ưu tiên tuyệt đối trước \texttt{declared}. \\
+            \textbf{3} & \textbf{FileRole Ceiling} & Auxiliary khóa trần ở \texttt{heuristic}; Media chặn tạo candidate. \\
+            \textbf{4} & \textbf{Round-Robin Coverage} & Giới hạn 50 candidate đại diện nhưng bảo toàn 12 nhóm license. \\
+            \textbf{5} & \textbf{Full Candidate Check} & Kiểm tra conflict trên toàn bộ candidate trước khi cắt giảm. \\
+            \textbf{6} & \textbf{Policy Gate} & Lọc claims $<$ floor trước khi resolution để chống conflict giả. \\
+            \textbf{7} & \textbf{Multi-Group Withholding} & Thư mục Multi-Group: Root là \texttt{file}, đưa thông số model vào \texttt{withheld}. \\
             \textbf{8} & \textbf{SPDX Auto-Routing} & Khớp SPDX $\to$ \texttt{license.id}; Không khớp $\to$ \texttt{license.name}. \\
             \bottomrule
         \end{tabular}
@@ -1835,7 +2038,7 @@ VACUUM;
 \begin{frame}{Ví Dụ Trực Quan: Đọc Header File 40 GB Trong Dưới 5ms}
     \begin{columns}[onlytextwidth, T]
         \begin{column}{0.48\textwidth}
-            \begin{alertbox}[{\faTimesCircle \hspace{2pt} Cách Truyền Thống (Load Toàn Bộ)}]
+            \begin{alertbox}[{\faTimesCircle \hspace{2pt} Phương Pháp Eager Loading (Nạp Toàn Bộ)}]
                 \scriptsize
                 \begin{itemize}
                     \item Dùng Python/PyTorch load toàn bộ file weights 40 GB vào RAM.
@@ -1846,7 +2049,7 @@ VACUUM;
         \end{column}
         \hfill
         \begin{column}{0.48\textwidth}
-            \begin{successbox}[{\faBolt \hspace{2pt} Cơ Chế Binary Sniffer Của AI-BOM}]
+            \begin{successbox}[{\faBolt \hspace{2pt} Cơ Chế Binary Sniffer (Zero-Copy Header Parsing)}]
                 \scriptsize
                 \begin{itemize}
                     \item Đọc đúng \textbf{8 bytes đầu} để lấy độ dài header ($N$ bytes).
@@ -1857,6 +2060,54 @@ VACUUM;
             \end{successbox}
         \end{column}
     \end{columns}
+\end{frame}
+
+\begin{frame}{Sơ Đồ Trực Quan: Cấu Trúc File Nhị Phân \& Quét 2 Giai Đoạn}
+    \begin{center}
+    \resizebox{0.96\textwidth}{!}{
+    \begin{tikzpicture}[auto, >=Latex, font=\scriptsize]
+        % File Representation (40 GB on Disk)
+        \node[draw=myprimary, fill=myprimary!10, rounded corners=2pt, minimum width=1.5cm, minimum height=1.0cm, align=center] (hdr_len) at (0.8, 1.2) {
+            \textbf{8 Bytes}\\
+            \tiny Header Len $N$
+        };
+        \node[draw=myaccent, fill=myaccent!15, rounded corners=2pt, minimum width=3.2cm, minimum height=1.0cm, align=center] (hdr_json) at (3.3, 1.2) {
+            \textbf{JSON Header ($N$ bytes)}\\
+            \tiny Tensor shapes, dtypes, metadata
+        };
+        \node[draw=gray!80, fill=gray!15, rounded corners=2pt, minimum width=6.8cm, minimum height=1.0cm, align=center] (weights) at (8.5, 1.2) {
+            \textbf{Ma Trận Model Weights Nhị Phân (~39.99 GB)}\\
+            \tiny Hàng tỷ giá trị float16 / bfloat16 / int4
+        };
+
+        % Bracket / Label for 40 GB File
+        \draw[thick, decorate, decoration={brace, amplitude=5pt, mirror}] (0, 0.5) -- (12.0, 0.5) node[midway, below=6pt, font=\scriptsize\bfseries] {Tệp Nhị Phân 40 GB Trên Đĩa Cứng (\texttt{model.safetensors})};
+
+        % Phase 1 Arrow & Box
+        \node[draw=mygreen, fill=mygreen!8, rounded corners=4pt, text width=5.2cm, align=left, drop shadow] (p1_box) at (2.4, -1.5) {
+            \textbf{\faBolt \ \textcolor{mygreen}{Phase 1: Binary Sniffer ($<5$ms)}}\\[2pt]
+            \tiny $\bullet$ Đọc đúng $8 + N$ bytes $\to$ dừng lại ngay!\\
+            \tiny $\bullet$ Trích xuất số params, dtypes cấp \textbf{Measured}.\\
+            \tiny $\bullet$ \textbf{RAM tiêu tốn}: $< 50\text{ MB}$ (Tuyệt đối không load weights).
+        };
+        \draw[->, line width=1.3pt, mygreen] (p1_box.north) -- (2.4, 0.6);
+
+        % Phase 2 Arrow & Box
+        \node[draw=myorange, fill=myorange!8, rounded corners=4pt, text width=5.4cm, align=left, drop shadow] (p2_box) at (8.8, -1.5) {
+            \textbf{\faFingerprint \ \textcolor{myorange}{Phase 2: Streaming Hash ($<50$MB RAM)}}\\[2pt]
+            \tiny $\bullet$ Đọc buffer tuần tự (64 KB/chunk) $\to$ băm SHA-256.\\
+            \tiny $\bullet$ Tra cứu Layer 2 Cache để map candidates ($<1$ms).\\
+            \tiny $\bullet$ \textbf{An toàn bộ nhớ}: Triệt tiêu 100\% nguy cơ tràn RAM (OOM).
+        };
+        \draw[->, line width=1.3pt, myorange] (p2_box.north) -- (8.8, 0.6);
+    \end{tikzpicture}
+    }
+    \end{center}
+    \vspace{-0.2cm}
+    \begin{infobox}[{\faLightbulb \hspace{2pt} Giải Quyết Hoàn Toàn Nghịch Lý Hiệu Năng}]
+        \scriptsize
+        Tách biệt hoàn toàn giữa \textbf{trích xuất thuộc tính hình thái} (chỉ đọc header trong $<5$ms) và \textbf{định danh cryptographic} (đọc luồng chunking để tính SHA-256 mà không nạp weights vào RAM).
+    \end{infobox}
 \end{frame}
 
 \begin{frame}{Quét An Toàn File PyTorch .pt / .bin (Pickle Scanner)}
@@ -1873,6 +2124,60 @@ VACUUM;
             \item Trích xuất an toàn tensor keys $\to$ \textbf{Triệt tiêu nguy cơ thực thi mã độc (RCE)}.
         \end{itemize}
     \end{successbox}
+\end{frame}
+
+\begin{frame}{Sơ Đồ Trực Quan: Máy Trạng Thái Tĩnh Quét Mã Độc Pickle}
+    \begin{center}
+    \resizebox{0.96\textwidth}{!}{
+    \begin{tikzpicture}[auto, >=Latex, font=\scriptsize]
+        % Left Input
+        \node[draw=myprimary, fill=myprimary!10, rounded corners=3pt, text width=2.6cm, align=center] (file) at (0, 0) {
+            {\normalsize \faFileCode}\\[2pt]
+            \textbf{Tệp PyTorch}\\
+            \texttt{model.bin / .pt}\\[2pt]
+            \tiny Định dạng Pickle bytecode
+        };
+
+        % Top: Standard Python (Vulnerable)
+        \node[draw=myalert, fill=myalert!8, rounded corners=3pt, text width=4.0cm, align=left, drop shadow] (py) at (5.4, 1.4) {
+            \textbf{\faTimesCircle \ \textcolor{myalert}{Python Chuẩn (\texttt{torch.load})}}\\[2pt]
+            \tiny $\bullet$ Khởi tạo Python runtime hoàn chỉnh\\
+            \tiny $\bullet$ Tự động thực thi \texttt{\_\_reduce\_\_}\\
+            \tiny $\bullet$ \textbf{Hậu quả}: Bị kích hoạt mã độc RCE (\texttt{os.system})!
+        };
+
+        % Bottom: AI-BOM Rust FSM (Safe)
+        \node[draw=mygreen, fill=mygreen!8, rounded corners=3pt, text width=4.0cm, align=left, drop shadow] (rust) at (5.4, -1.4) {
+            \textbf{\faShield* \ \textcolor{mygreen}{AI-BOM (\texttt{formats/pickle.rs})}}\\[2pt]
+            \tiny $\bullet$ \textbf{Máy trạng thái tĩnh (FSM)} duyệt opcodes\\
+            \tiny $\bullet$ 0 khởi tạo Python, 0 thực thi code\\
+            \tiny $\bullet$ Chỉ parse tên khóa tensor weights an toàn
+        };
+
+        % Result Top
+        \node[draw=myalert, fill=myalert!15, rounded corners=3pt, text width=2.4cm, align=center] (rce) at (10.2, 1.4) {
+            \textbf{\faSkullCrossbones \ \textcolor{myalert}{Nguy Cơ RCE}}\\
+            \tiny Chiếm quyền kiểm soát máy chủ scanner
+        };
+
+        % Result Bottom
+        \node[draw=mygreen, fill=mygreen!15, rounded corners=3pt, text width=2.4cm, align=center] (safe) at (10.2, -1.4) {
+            \textbf{\faLock \ \textcolor{mygreen}{An Toàn 100\%}}\\
+            \tiny Trích xuất an toàn hoặc cảnh báo độc hại
+        };
+
+        \draw[->, line width=1.1pt, dashed, myalert] (file.east) -- (py.west);
+        \draw[->, line width=1.2pt, mygreen] (file.east) -- (rust.west);
+        \draw[->, line width=1.1pt, myalert] (py.east) -- (rce.west);
+        \draw[->, line width=1.2pt, mygreen] (rust.east) -- (safe.west);
+    \end{tikzpicture}
+    }
+    \end{center}
+    \vspace{-0.2cm}
+    \begin{infobox}[{\faCheckCircle \hspace{2pt} Bảo Mật Tuyệt Đối Chuỗi Cung Ứng AI}]
+        \scriptsize
+        Bộ phân tích opcode tĩnh của AI-BOM giải mã các chỉ lệnh nhị phân cấp thấp mà không bao giờ kích hoạt bất kỳ lệnh gọi hệ thống nào, ngăn chặn triệt để các tệp weights độc hại tấn công hạ tầng doanh nghiệp.
+    \end{infobox}
 \end{frame}
 
 \begin{frame}{Tích Hợp Hệ Sinh Thái OPSWAT: \texttt{aibom-ffi} \& MetaDefender}
@@ -1944,17 +2249,17 @@ VACUUM;
     \end{columns}
 \end{frame}
 
-\begin{frame}{4 Vấn Đề Kỹ Thuật Thực Tế Đã Xử Lý Triệt Để}
+\begin{frame}{4 Thách Thức Kỹ Thuật Đã Được Xử Lý Triệt Để}
     \begin{center}
     \resizebox{0.96\textwidth}{!}{
     \renewcommand{\arraystretch}{1.1}
     \begin{tabular}{c l p{0.68\textwidth}}
         \toprule
-        \textbf{\#} & \textbf{Vấn Đề Gặp Phải} & \textbf{Giải Pháp Đã Xử Lý} \\
+        \textbf{\#} & \textbf{Thách Thức Kỹ Thuật} & \textbf{Giải Pháp Đã Xử Lý} \\
         \midrule
         \textbf{1} & Sót file ONNX bị chia nhỏ & Regex cắt hậu tố \texttt{\_<digits>} $\to$ gom 245 file split (332 GB) vào đúng model group. \\
-        \textbf{2} & Nhận diện sai file 0-byte & Loại bỏ mã hash \texttt{EMPTY\_SHA256} khỏi danh tính weight set. \\
-        \textbf{3} & Tràn metadata thư mục đa model & Gỡ shape fields khỏi root component, đưa vào danh sách \texttt{withheld}. \\
+        \textbf{2} & Xử lý file weights 0-byte không hợp lệ & Loại bỏ mã hash \texttt{EMPTY\_SHA256} khỏi danh tính weight set. \\
+        \textbf{3} & Tránh ô nhiễm metadata thư mục Multi-Group & Gỡ shape fields khỏi root component, đưa vào danh sách \texttt{withheld}. \\
         \textbf{4} & 4,950 model khai license "other" & Tách cột \texttt{license\_name} \& \texttt{license\_link} $\to$ chuẩn hóa \textbf{3,466 models} sang tên license chuẩn. \\
         \bottomrule
     \end{tabular}
@@ -1966,9 +2271,9 @@ VACUUM;
     \begin{successbox}[{\faAward \hspace{2pt} Giá Trị Cốt Lõi Của AI-BOM 0.1.0}]
         \scriptsize
         \begin{enumerate}
-            \item \textbf{Mô hình 4 mức tin cậy}: Đo đạc cấu trúc nhị phân trực tiếp > lời khai web, bảo đảm tính xác thực khoa học.
+            \item \textbf{Hệ thống 4 cấp Evidence Class}: Đo đạc cấu trúc binary trực tiếp > Declared metadata trên web, bảo đảm tính xác thực khoa học.
             \item \textbf{SQLite 2 tầng}: Quét 100\% offline không phụ thuộc mạng, nén 50k models còn ~18 KB/model (~912 MB).
-            \item \textbf{Xử lý 12 tình huống thực tế}: 1--N fan-out, multi-quant, sharded weights, mâu thuẫn license.
+            \item \textbf{Xử lý 12 tình huống thực tế}: 1--N fan-out, multi-group quantization, sharded weights, conflict license.
             \item \textbf{Chuẩn hóa quốc tế}: Hỗ trợ chuẩn CycloneDX 1.6 ML-BOM và format mở rộng nội bộ.
         \end{enumerate}
     \end{successbox}

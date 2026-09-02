@@ -307,6 +307,62 @@
     \end{columns}
 \end{frame}
 
+\begin{frame}{Thực Tế Cấu Trúc Repo: Sharded Weights \& Đa Nhóm GGUF}
+    \begin{columns}[onlytextwidth, T]
+        \begin{column}{0.485\textwidth}
+            \textbf{\textcolor{myprimary}{\faPuzzlePiece \ 1 Model Nhiều Shards (\texttt{Qwen2.5-7B})}}\\[3pt]
+            \begin{center}
+                {\setlength{\fboxsep}{1pt}\fcolorbox{myprimary!40}{white}{\includegraphics[width=\linewidth, height=0.44\textheight, keepaspectratio]{figures/case_sharded_weights_qwen.png}}}
+            \end{center}
+            \vspace{-0.2cm}
+            \begin{infobox}[{\faSearch \ Sharded Weights (4 Mảnh)}]
+                \tiny
+                Model chia thành \texttt{00001} $\to$ \texttt{00004.safetensors} kèm \texttt{index.json}. Engine tự động gom nhóm để tính \texttt{weight\_set\_sha256}.
+            \end{infobox}
+        \end{column}
+        \hfill
+        \begin{column}{0.485\textwidth}
+            \textbf{\textcolor{myaccent}{\faLayerGroup \ 1 Repo Đa Nhóm Weights (\texttt{LLaMA-3 GGUF})}}\\[3pt]
+            \begin{center}
+                {\setlength{\fboxsep}{1pt}\fcolorbox{myaccent!40}{white}{\includegraphics[width=\linewidth, height=0.44\textheight, keepaspectratio]{figures/case_multigroup_gguf_llama3.png}}}
+            \end{center}
+            \vspace{-0.2cm}
+            \begin{infobox}[{\faShield* \ Multi-Group Withholding}]
+                \tiny
+                Chứa $>15$ phiên bản quant (\texttt{IQ1}, \texttt{IQ2}, \texttt{IQ4}). Engine kích hoạt withholding tại root để ngăn rò rỉ metadata sai lệch.
+            \end{infobox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Thực Tế Cấu Trúc Repo: Single Model \& Đa Định Dạng Weights}
+    \begin{columns}[onlytextwidth, T]
+        \begin{column}{0.485\textwidth}
+            \textbf{\textcolor{mygreen}{\faCube \ 1 Model -- 1 Repo Chuẩn Mực (\texttt{CLIP})}}\\[3pt]
+            \begin{center}
+                {\setlength{\fboxsep}{1pt}\fcolorbox{mygreen!40}{white}{\includegraphics[width=\linewidth, height=0.44\textheight, keepaspectratio]{figures/case_single_model_clip.png}}}
+            \end{center}
+            \vspace{-0.2cm}
+            \begin{infobox}[{\faCheckCircle \ Ánh Xạ 1--1 Tối Giản}]
+                \tiny
+                Chỉ chứa 1 model weights duy nhất kèm cấu hình. Ánh xạ trực tiếp $1-1$ với component trong tài liệu CycloneDX 1.6 ML-BOM.
+            \end{infobox}
+        \end{column}
+        \hfill
+        \begin{column}{0.485\textwidth}
+            \textbf{\textcolor{mypurple}{\faBoxes \ 1 Repo Đa Định Dạng (\texttt{MiniLM})}}\\[3pt]
+            \begin{center}
+                {\setlength{\fboxsep}{1pt}\fcolorbox{mypurple!40}{white}{\includegraphics[width=\linewidth, height=0.44\textheight, keepaspectratio]{figures/case_multiformat_minilm.png}}}
+            \end{center}
+            \vspace{-0.2cm}
+            \begin{infobox}[{\faCodeBranch \ Song Song Safetensors -- Bin -- ONNX}]
+                \tiny
+                Cùng 1 model nhưng có cả \texttt{.safetensors}, \texttt{.bin}, \texttt{onnx/}, \texttt{openvino/}. Engine gom nhóm theo kiến trúc tương đương.
+            \end{infobox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
 \begin{frame}{Kiến Trúc SQLite 2 Tầng: Tách Biệt Raw Data \& Cache}
     \begin{figure}
         \centering
@@ -408,6 +464,125 @@
     \begin{infobox}[{\faShield* \hspace{2pt} Ý Nghĩa Kiến Trúc}]
         \scriptsize
         Tách biệt hoàn toàn tầng lưu trữ nguyên thủy (Raw Ingestion) và tầng lập chỉ mục (Clean Projection). Giúp kỹ sư thử nghiệm hàng chục bộ quy tắc chuẩn hóa mà không gây nghẽn mạng hay bị khóa API.
+    \end{infobox}
+\end{frame}
+
+\begin{frame}{Sơ Đồ Kiến Trúc Toàn Hệ Thống (3-Layer Data Flow)}
+    \begin{center}
+    \resizebox{0.96\textwidth}{!}{
+    \begin{tikzpicture}[auto, >=Latex, font=\scriptsize]
+        % ----------------------------------------------------
+        % LAYER 1 Container
+        % ----------------------------------------------------
+        \node[draw=myprimary!60, fill=myprimary!5, rounded corners=6pt, dashed, line width=0.8pt, 
+              minimum width=5.6cm, minimum height=2.6cm] (l1_box) at (1.8, 2.3) {};
+        \node[anchor=north west, font=\fontsize{6.5}{7.5}\selectfont\bfseries, text=myprimary] at (l1_box.north west) {
+            \hspace{3pt} \faArchive \ LAYER 1: Ingestion \& Harvest (Internal)
+        };
+        
+        \node[draw=myprimary, fill=white, rounded corners=3pt, text width=1.8cm, align=center] (hf) at (0.2, 2.15) {
+            \textbf{\faGlobe \ HF Hub}\\[1pt]
+            \tiny API \& Git
+        };
+        \node[draw=myprimary, fill=myprimary!12, rounded corners=3pt, text width=2.0cm, align=center, drop shadow] (l1) at (3.6, 2.15) {
+            \textbf{\faDatabase \ Raw Store}\\[1pt]
+            \texttt{\tiny aibom\_raw.sqlite}\\[1pt]
+            \tiny ($\approx$4 GB)
+        };
+        \draw[->, line width=1.2pt, myprimary] (hf.east) -- node[above=2pt, font=\fontsize{6}{7}\selectfont\bfseries, text=myprimary] {Worker} (l1.west);
+
+        % ----------------------------------------------------
+        % LAYER 2 Container
+        % ----------------------------------------------------
+        \node[draw=myaccent!70, fill=myaccent!5, rounded corners=6pt, line width=0.8pt, 
+              minimum width=10.4cm, minimum height=2.6cm] (l2_box) at (13.6, 2.3) {};
+        \node[anchor=north west, font=\fontsize{6.5}{7.5}\selectfont\bfseries, text=myaccent] at (l2_box.north west) {
+            \hspace{3pt} \faDatabase \ LAYER 2: Indexed Cache (\texttt{aibom.sqlite} $\approx$912 MB $\bullet$ Phân Phối Kèm Scanner)
+        };
+
+        % Rebuild arrow from L1 directly to l2_main
+        \node[draw=myaccent, fill=myaccent!12, rounded corners=3pt, text width=2.4cm, align=center, drop shadow] (l2_main) at (10.0, 2.15) {
+            \textbf{\faSearch \ Cache DB}\\[1pt]
+            \texttt{\tiny aibom.sqlite}\\[1pt]
+            \tiny Index B-Tree
+        };
+        
+        \draw[->, line width=1.4pt, myaccent] (l1.east) -- 
+            node[above=2pt, font=\fontsize{6}{7}\selectfont\bfseries, text=myaccent, fill=white, inner sep=1.5pt, rounded corners=2pt, align=center] {Offline Replay (Rust)} 
+            node[below=2pt, font=\fontsize{5.5}{6.5}\selectfont\bfseries, text=myprimary, fill=white, inner sep=1.5pt, rounded corners=2pt, align=center] {Rebuild (0 mạng)} (l2_main.west);
+
+        % Tables inside Layer 2
+        \node[draw=myaccent!80, fill=white, rounded corners=2pt, text width=2.5cm, align=center] (t_model) at (13.7, 2.6) {
+            \textbf{\texttt{\tiny model}}\\[-1pt]
+            \fontsize{5}{6}\selectfont 40 cột DDL chuẩn
+        };
+        \node[draw=myaccent!80, fill=white, rounded corners=2pt, text width=2.5cm, align=center] (t_file) at (17.0, 2.6) {
+            \textbf{\texttt{\tiny model\_file}}\\[-1pt]
+            \fontsize{5}{6}\selectfont Hashes, roles, sizes
+        };
+        \node[draw=myaccent!80, fill=white, rounded corners=2pt, text width=2.5cm, align=center] (t_ws) at (13.7, 1.65) {
+            \textbf{\texttt{\tiny weight\_set}}\\[-1pt]
+            \fontsize{5}{6}\selectfont Nhóm weights sharded
+        };
+        \node[draw=myaccent!80, fill=white, rounded corners=2pt, text width=2.5cm, align=center] (t_fts) at (17.0, 1.65) {
+            \textbf{\texttt{\tiny fts\_model}}\\[-1pt]
+            \fontsize{5}{6}\selectfont FTS5 full-text search
+        };
+
+        \draw[-, line width=0.6pt, myaccent!60] (l2_main.east) -- (t_model.west);
+        \draw[-, line width=0.6pt, myaccent!60] (l2_main.east) -- (t_ws.west);
+
+        % ----------------------------------------------------
+        % LAYER 3 Container (Offline Scanner Engine)
+        % ----------------------------------------------------
+        \node[draw=mygreen!80, fill=mygreen!5, rounded corners=6pt, line width=0.9pt, 
+              minimum width=19.8cm, minimum height=2.6cm] (l3_box) at (9.2, -1.0) {};
+        \node[anchor=north west, font=\fontsize{6.5}{7.5}\selectfont\bfseries, text=mygreen] at (l3_box.north west) {
+            \hspace{3pt} \faCogs \ LAYER 3: Offline Scanner Engine (\texttt{aibom-core} Rust $\bullet$ 100\% Zero-Network)
+        };
+
+        \node[draw=mygreen, fill=white, rounded corners=3pt, text width=2.1cm, align=center] (target) at (0.2, -1.15) {
+            \textbf{\faFolderOpen \ Artifact}\\[1pt]
+            \tiny File / Thư mục
+        };
+        \node[draw=mygreen, fill=white, rounded corners=3pt, text width=2.1cm, align=center] (sniff) at (3.5, -1.15) {
+            \textbf{\faBolt \ Sniffer}\\[1pt]
+            \tiny Header $<5\text{ms}$
+        };
+        \node[draw=mygreen, fill=white, rounded corners=3pt, text width=2.5cm, align=center] (group) at (6.8, -1.15) {
+            \textbf{\faFilter \ Phân Loại File}\\[1pt]
+            \tiny Gom nhóm weights
+        };
+        \node[draw=myprimary, fill=myprimary!10, rounded corners=3pt, text width=2.6cm, align=center, drop shadow] (resolve) at (10.0, -1.15) {
+            \textbf{\faSearch \ Match Resolver}\\[1pt]
+            \tiny Exact SHA $\to$ Heuristic
+        };
+        \node[draw=mygreen, fill=white, rounded corners=3pt, text width=2.3cm, align=center] (enrich) at (13.5, -1.15) {
+            \textbf{\faBalanceScale \ Hòa Giải}\\[1pt]
+            \tiny Lọc floor, merge
+        };
+        \node[draw=mygreen, fill=mygreen!15, rounded corners=3pt, text width=2.3cm, align=center, drop shadow] (out) at (16.9, -1.15) {
+            \textbf{\faFileCode \ Output BOM}\\[1pt]
+            \tiny CycloneDX 1.6
+        };
+
+        % Layer 3 intra-pipeline arrows with generous spacing
+        \draw[->, line width=1.3pt, mygreen] (target.east) -- (sniff.west);
+        \draw[->, line width=1.3pt, mygreen] (sniff.east) -- (group.west);
+        \draw[->, line width=1.3pt, mygreen] (group.east) -- (resolve.west);
+        \draw[->, line width=1.3pt, mygreen] (resolve.east) -- (enrich.west);
+        \draw[->, line width=1.3pt, mygreen] (enrich.east) -- (out.west);
+
+        % Cross-layer connection: Layer 2 Cache to Layer 3 Match Resolver (PERFECTLY VERTICAL)
+        \draw[->, line width=1.4pt, dashed, myaccent] (l2_main.south) -- 
+            node[pos=0.22, right=4pt, font=\fontsize{5.5}{6.5}\selectfont\bfseries, text=myaccent, fill=white, inner sep=2pt, rounded corners=2pt, align=left] {Read-Only Query\\[1pt]\tiny($<1\text{ms}$)} (resolve.north);
+    \end{tikzpicture}
+    }
+    \end{center}
+    \vspace{-0.2cm}
+    \begin{infobox}[{\faShield* \hspace{2pt} Kiến Trúc 3 Tầng: Thu Thập -- Bộ Đệm -- Động Cơ Quét}]
+        \scriptsize
+        Layer 1 thu thập raw JSON nội bộ $\to$ Layer 2 lập chỉ mục siêu nhẹ ($\approx$18 KB/model) phân phối kèm scanner $\to$ Layer 3 quét nhị phân ngoại tuyến 100\% không cần kết nối mạng.
     \end{infobox}
 \end{frame}
 
@@ -603,10 +778,10 @@ VACUUM;
                 \tiny File / Directory local
             };
             
-            % Step 1: dirscan & Rule 9
+            % Step 1: dirscan & Gom nhóm weights
             \node[draw=myprimary, fill=myprimary!12, rounded corners, text width=3.0cm, align=center, drop shadow] (step1) at (3.8, 2) {
-                \textbf{\textcolor{myprimary}{1. dirscan / Rule 9}}\\[2pt]
-                \tiny \texttt{fileset.rs} · Nhận diện Role\\Gom Shards, ONNX data
+                \textbf{\textcolor{myprimary}{1. dirscan \& Gom Nhóm}}\\[2pt]
+                \tiny \texttt{fileset.rs} · Phân loại FileRole\\Gom Shards, ONNX data
             };
             
             % Step 2: Phase 1 Sniffing

@@ -248,63 +248,98 @@
 \section{Crawl Dữ Liệu Hugging Face \& Cache SQLite}
 
 \begin{frame}{Số Liệu Thực Tế Khi Crawl 50.000 Models (\texttt{data/poc-50k})}
+    \vspace{-0.15cm}
+    \begin{columns}[onlytextwidth]
+        \begin{column}{0.31\textwidth}
+            \begin{infobox}[{\faDatabase \hspace{2pt} Quy Mô Model}]
+                \scriptsize \textbf{49.992 / 50.000} (99.98\%)\\[2pt]
+                \tiny Top models tải nhiều nhất Hugging Face
+            \end{infobox}
+        \end{column}
+        \hfill
+        \begin{column}{0.33\textwidth}
+            \begin{infobox}[{\faHashtag \hspace{2pt} Tệp Nhị Phân}]
+                \scriptsize \textbf{798.682 Hashes} (705k weights)\\[2pt]
+                \tiny 47.854 Weight Sets (\texttt{weight\_set\_sha256})
+            \end{infobox}
+        \end{column}
+        \hfill
+        \begin{column}{0.32\textwidth}
+            \begin{successbox}[{\faHdd \hspace{2pt} CSDL Ngoại Tuyến}]
+                \scriptsize \textbf{$\approx$912 MB SQLite}\\[2pt]
+                \tiny 18 KB/model $\cdot$ Tra cứu SHA $<1$ms
+            \end{successbox}
+        \end{column}
+    \end{columns}
+    \vspace{0.12cm}
     \begin{columns}[onlytextwidth, T]
-        \begin{column}{0.54\textwidth}
+        \begin{column}{0.53\textwidth}
             \centering
             \resizebox{\columnwidth}{!}{
-            \renewcommand{\arraystretch}{1.08}
-            \begin{tabular}{l r r}
+            \renewcommand{\arraystretch}{1.18}
+            \begin{tabular}{l r}
                 \toprule
-                \textbf{Chỉ số đo đạc} & \textbf{Dataset 20k} & \textbf{Dataset 50k (Hiện tại)} \\
+                \textbf{Chỉ số đo đạc} & \textbf{Dữ liệu thực nghiệm (50.000 Models)} \\
                 \midrule
-                Tổng số Models & 19,998 & \textbf{49,992 / 50,000} \\
-                Tổng số File Hashes & 268,052 & \textbf{798,682 hashes} \\
-                File Weights & 267,979 & \textbf{705,158} (93.85\%) \\
-                Distinct Weight Sets & 19,235 & \textbf{47,854 sets} \\
-                Hash trùng đa Repo & 6.10\% & \textbf{5.11\%} (max 1,037) \\
-                Repo đa nhóm Weight & 57.4\% & \textbf{65.1\% repos} \\
-                Dung lượng DB L2 & $\approx$360 MB & \textbf{$\approx$912 MB} (18 KB/model) \\
+                Tổng số Models & \textbf{49,992 / 50,000} (99.98\%) \\
+                Tổng số File Hashes & \textbf{798,682 hashes} \\
+                File Weights nhị phân & \textbf{705,158} (93.85\%) \\
+                Distinct Weight Sets & \textbf{47,854 sets} \\
+                Tái sử dụng hash (>1 repo) & \textbf{5.11\%} (max 1,037 repos) \\
+                Repo đa nhóm Weight & \textbf{65.1\% repos} \\
+                Thời gian crawl (Harvest) & \textbf{14 giờ 35 phút} \\
+                Dung lượng DB Layer 2 & \textbf{$\approx$912 MB} (18 KB/model) \\
                 \bottomrule
             \end{tabular}
             }
         \end{column}
         \hfill
-        \begin{column}{0.40\textwidth}
-            \begin{infobox}[{\faChartPie \hspace{2pt} Nhận Xét Thực Tế}]
+        \begin{column}{0.44\textwidth}
+            \begin{infobox}[{\faChartPie \hspace{2pt} Hai Đặc Thù Cốt Lõi}]
                 \scriptsize
-                \begin{itemize}
-                    \item 5.11\% hash xuất hiện ở $>1$ repo $\to$ hiện tượng trùng file là bản chất của AI Hub.
-                    \item 65.1\% repo chứa $>1$ nhóm weights $\to$ bắt buộc phải tách nhỏ theo từng nhóm.
-                \end{itemize}
+                $\bullet$ \textbf{Trùng file xuyên repo}: 5.11\% hash xuất hiện ở $>1$ repo. File phụ như \texttt{tokenizer.json} xuất hiện ở \textbf{1.037 repos} kèm 12 nhóm giấy phép khác nhau.\\[5pt]
+                $\bullet$ \textbf{Bùng nổ đa nhóm (Multi-Group)}: 65.1\% repo chứa $>1$ nhóm weights (22.7\% repo chứa $>10$ nhóm) $\to$ Bắt buộc phải gom cụm bằng \textbf{Weight Sets} và phân rã sub-components.
             \end{infobox}
         \end{column}
     \end{columns}
 \end{frame}
 
-\begin{frame}{Những "Bẫy Dữ Liệu" Trên Hugging Face Hub}
+\begin{frame}{Những "Bẫy Dữ Liệu" Thực Tế Khi Crawl Hugging Face Hub}
+    \vspace{-0.15cm}
     \begin{columns}[onlytextwidth, T]
-        \begin{column}{0.48\textwidth}
-            \begin{warnbox}[{\faFile \hspace{2pt} 1. README Không Chuẩn Hóa}]
+        \begin{column}{0.485\textwidth}
+            \begin{warnbox}[{\faFileCode \hspace{2pt} 1. YAML Rác \& Metadata Phình To}]
                 \scriptsize
-                Tác giả nhúng toàn văn bài báo vào YAML $\to$ metadata phình to hàng chục MB văn bản phi cấu trúc.
+                $\bullet$ \textbf{Thực tế}: YAML nhúng cả bài báo/base64 $>15$MB $\to$ Dễ crash parser, tràn bộ nhớ.\\[3pt]
+                $\bullet$ \textbf{Xử lý}: Allowlist 17 keys chuẩn; lưu băm \texttt{card\_text\_sha256} để audit.
             \end{warnbox}
-            \begin{warnbox}[{\faCompress \hspace{2pt} 2. File Dùng Chung Trùng Hàng Nghìn Repo}]
+            \vspace{0.08cm}
+            \begin{warnbox}[{\faClone \hspace{2pt} 2. File Phụ Trùng 1.037 Repo}]
                 \scriptsize
-                File \texttt{tokenizer.json} xuất hiện ở \textbf{1,037 repos} với 12 license khác nhau.
+                $\bullet$ \textbf{Thực tế}: \texttt{tokenizer.json} xuất hiện ở \textbf{1.037 repos} với 12 nhóm license đối lập (MIT vs GPL).\\[3pt]
+                $\bullet$ \textbf{Xử lý}: Giới hạn ở mức \texttt{Heuristic}; không dùng file phụ để đoán model.
             \end{warnbox}
         \end{column}
         \hfill
-        \begin{column}{0.48\textwidth}
-            \begin{warnbox}[{\faExchange* \hspace{2pt} 3. Conflict Trong Cùng 1 Repo}]
+        \begin{column}{0.485\textwidth}
+            \begin{warnbox}[{\faRandom \hspace{2pt} 3. Conflict Ngay Trong Cùng 1 Repo}]
                 \scriptsize
-                Cùng 1 model: Tags ngoài ghi \texttt{Apache-2.0} nhưng Card trong ghi \texttt{MIT}.
+                $\bullet$ \textbf{Thực tế}: Tags ngoài Web UI ghi \texttt{Apache-2.0}, nhưng file \texttt{README.md} bên trong lại ghi \texttt{MIT}.\\[3pt]
+                $\bullet$ \textbf{Xử lý}: Không đoán mò $\to$ Withholding native slot, lưu đủ 2 claims vào \texttt{evidence}.
             \end{warnbox}
-            \begin{warnbox}[{\faLayerGroup \hspace{2pt} 4. 1 Repo Chứa Nhiều Model Con}]
+            \vspace{0.08cm}
+            \begin{warnbox}[{\faLayerGroup \hspace{2pt} 4. 1 Repo Chứa Nhiều Bản Quant}]
                 \scriptsize
-                1 repo chứa 7 file GGUF quantization khác nhau (Q2, Q4, FP16).
+                $\bullet$ \textbf{Thực tế}: Repo chứa 7 bản GGUF (\texttt{Q2, Q4, Q8}) kèm \texttt{config.json} chỉ ghi shape FP16 gốc.\\[3pt]
+                $\bullet$ \textbf{Xử lý}: Root hạ cấp thành \texttt{file}, tách 7 bản quant thành sub-components.
             \end{warnbox}
         \end{column}
     \end{columns}
+    \vspace{0.1cm}
+    \begin{alertbox}[{\faShield* \hspace{2pt} Nguyên Tắc Thiết Kế Cốt Lõi}]
+        \scriptsize
+        \textbf{Không tin cậy mù quáng vào Web}: Bắt buộc phải đối chiếu với số đo nhị phân (\textit{Measured}) từ file thật và giải quyết xung đột đa nguồn.
+    \end{alertbox}
 \end{frame}
 
 \begin{frame}{Thực Tế Cấu Trúc Repo: Sharded Weights \& Đa Nhóm GGUF}
@@ -732,7 +767,7 @@
             \tiny $\bullet$ \texttt{repo\_id} (\textbf{\textcolor{myprimary}{FK $\to$ model}})\\
             \tiny $\bullet$ \texttt{member\_count}, \texttt{total\_bytes}\\
             \vspace{1pt}
-            \centering \tiny \textit{47,854 chữ ký cụm Shards}
+            \centering \tiny \textit{47,854 Weight Sets (\texttt{weight\_set\_sha256})}
         };
 
         % Table 4: harvest_gap (1-N from model)
@@ -1247,7 +1282,7 @@
             \tiny $\bullet$ Khớp SHA-256 định danh chính xác model
         };
         \node[draw=myaccent, fill=myaccent!10, rounded corners=3pt, text width=4.6cm, align=left, drop shadow] (out2) at (9.6, 0.65) {
-            \textbf{\faLock \ \textcolor{myaccent}{Auxiliary Role: Khóa Trần}}\\
+            \textbf{\faLock \ \textcolor{myaccent}{Auxiliary Role: Giới Hạn Heuristic}}\\
             \tiny $\bullet$ Cấp tin cậy tối đa: \textbf{Heuristic}\\
             \tiny $\bullet$ Bị chặn: 0 cho phép tự ý gán purl model
         };
@@ -1593,7 +1628,7 @@
             \vspace{-0.1cm}
             \begin{successbox}[{\faSync \hspace{2pt} Cách Xử Lý}]
                 \scriptsize
-                Khóa trần \texttt{heuristic}, Round-Robin lấy 50 đại diện bảo toàn đủ 12 loại license.
+                Giới hạn mức \texttt{heuristic}, Round-Robin lấy 50 đại diện bảo toàn đủ 12 loại license.
             \end{successbox}
         \end{column}
         \hfill
@@ -1702,7 +1737,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Ví Dụ Trực Quan: Cách Gom Nhóm \& Tính Chữ Ký Sharded Weights}
+\begin{frame}{Ví Dụ Trực Quan: Gom Nhóm \& Tính Hash Sharded Weights}
     \begin{center}
     \resizebox{0.96\textwidth}{!}{
     \begin{tikzpicture}[auto, >=Latex, font=\scriptsize]
@@ -1732,7 +1767,7 @@
 
         % Step 3: Hash
         \node[draw=mygreen, fill=mygreen!10, rounded corners=3pt, text width=2.6cm, align=center] (hash) at (11.0, 0) {
-            \textbf{\faFingerprint \ 3. Băm Chữ Ký}\\
+            \textbf{\faFingerprint \ 3. Băm Hash Cụm Shard}\\
             \tiny $\text{SHA-256}(\text{RAW})$\\[2pt]
             \textbf{\textcolor{mygreen}{\texttt{weight\_set\_sha256}}}
         };
@@ -1746,7 +1781,7 @@
     \vspace{-0.15cm}
     \begin{infobox}[{\faCheckCircle \hspace{2pt} Tính Tất Định Tuyệt Đối (Determinism)}]
         \scriptsize
-        Cho dù hệ điều hành (Windows NTFS, Linux ext4, macOS APFS) liệt kê file theo thứ tự nào, bước \textbf{Lexicographical sort} đảm bảo chuỗi băm RAW luôn giống nhau $\to$ Chữ ký \texttt{weight\_set\_sha256} trùng khớp byte-for-byte trên mọi hệ thống.
+        Cho dù hệ điều hành (Windows NTFS, Linux ext4, macOS APFS) liệt kê file theo thứ tự nào, bước \textbf{Lexicographical sort} đảm bảo chuỗi băm RAW luôn giống nhau $\to$ Mã hash \texttt{weight\_set\_sha256} trùng khớp byte-for-byte trên mọi hệ thống.
     \end{infobox}
 \end{frame}
 
@@ -2543,7 +2578,7 @@
         };
         \node[draw=myprimary!50, fill=white, rounded corners=3pt, text width=3.8cm, align=left, below=0.20cm of b31] (b32) {
             \textbf{\textcolor{myprimary}{\faEnvelopeOpen \ Báo Cáo \mbox{Envelope}}}\\[2pt]
-            \tiny $\bullet$ Chữ ký nhóm file model (\texttt{weight\_set\_sha256})\\
+            \tiny $\bullet$ Mã hash nhóm file model (\texttt{weight\_set\_sha256})\\
             \tiny $\bullet$ Lưu vết nguồn gốc (Provenance) \& độ đầy đủ dữ liệu
         };
 

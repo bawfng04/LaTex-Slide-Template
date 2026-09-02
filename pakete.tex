@@ -1,7 +1,4 @@
-% ============================================================
-% AI/ML Research Beamer Template — Package Configuration
-% Author: Bang Nguyen Dinh (github/bawfng04)
-% ============================================================
+% pkg config
 
 % req pkgs
 \usepackage[utf8]{inputenc}
@@ -49,26 +46,26 @@
 % appendix section helper
 \usepackage{appendixnumberbeamer}
 
-% ============================================================
 % color palette
-% ============================================================
-\definecolor{myprimary}{HTML}{7B1113} % elegant burgundy / red-brown
-\definecolor{myaccent}{HTML}{B7410E}  % rust / dark orange for alerts
-\definecolor{mygreen}{HTML}{2E7D32}   % professional green for success
-\definecolor{mygrey}{HTML}{F4F4F6}    % soft grey for blocks
+\definecolor{myprimary}{HTML}{1A365D} % deep navy
+\definecolor{myaccent}{HTML}{0D9488}  % teal
+\definecolor{mygreen}{HTML}{059669}   % emerald
+\definecolor{mygrey}{HTML}{F1F5F9}    % slate grey
 
 % ============================================================
 % tcolorbox ui components
 % ============================================================
 
-% modern info block (blue-ish burgundy — neutral info)
+% modern info block
 \newtcolorbox{infobox}[1][]{
     enhanced,
     colback=myprimary!4,
     colframe=myprimary,
     boxrule=0.5pt,
-    leftrule=4pt,
+    leftrule=3.5pt,
     arc=3pt,
+    boxsep=2pt,
+    top=4pt,bottom=4pt,left=6pt,right=6pt,
     drop fuzzy shadow,
     fonttitle=\bfseries,
     coltitle=myprimary,
@@ -76,29 +73,33 @@
     title=#1
 }
 
-% modern alert block (rust orange — warnings / gaps)
+% modern alert block
 \newtcolorbox{alertbox}[1][]{
     enhanced,
-    colback=myaccent!4,
+    colback=myaccent!5,
     colframe=myaccent,
     boxrule=0.5pt,
-    leftrule=4pt,
+    leftrule=3.5pt,
     arc=3pt,
+    boxsep=2pt,
+    top=4pt,bottom=4pt,left=6pt,right=6pt,
     drop fuzzy shadow,
     fonttitle=\bfseries,
     coltitle=myaccent,
-    colbacktitle=myaccent!4,
+    colbacktitle=myaccent!5,
     title=#1
 }
 
-% modern success block (green — positive results / SOTA)
+% modern success block
 \newtcolorbox{successbox}[1][]{
     enhanced,
     colback=mygreen!4,
     colframe=mygreen,
     boxrule=0.5pt,
-    leftrule=4pt,
+    leftrule=3.5pt,
     arc=3pt,
+    boxsep=2pt,
+    top=4pt,bottom=4pt,left=6pt,right=6pt,
     drop fuzzy shadow,
     fonttitle=\bfseries,
     coltitle=mygreen,
